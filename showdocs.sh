@@ -50,6 +50,9 @@ infile=$(realpath "$@")
         extension=$(echo "${filename##*.}" | tr '[:upper:]' '[:lower:]')
         mimetype=$(file "$filename" | awk -F ':' '{ print $2 }') 
         case "$extension" in
+            epub)
+                epy "$infile"
+                ;;
             docx)  
                 if [[ "$mimetype" == *"$docxstring"* ]];then
                     pandoc -f docx "$infile" | lynx -stdin -lss=/home/steven/.lynx/lynx.lss
