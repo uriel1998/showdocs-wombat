@@ -43,6 +43,7 @@ if [ "$1" == "-h" ];then
 fi    
 
 infile=$(realpath "$@")
+indir=$(dirname "$infile")
 
     if [ -f "$infile" ]; then
         filename=$(basename "$infile")
@@ -50,31 +51,34 @@ infile=$(realpath "$@")
         extension=$(echo "${filename##*.}" | tr '[:upper:]' '[:lower:]')
         mimetype=$(file "$filename" | awk -F ':' '{ print $2 }') 
         case "$extension" in
+            csv)
+                pspg -s 11 --csv -f "$infile"
+                ;;
             epub)
                 epy "$infile"
                 ;;
             docx)  
                 if [[ "$mimetype" == *"$docxstring"* ]];then
-                    pandoc -f docx "$infile" | lynx -stdin -lss=/home/steven/.lynx/lynx.lss
+                    pandoc -f docx "$infile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | lynx -stdin -lss=/home/steven/.lynx/lynx.lss
                 fi
                 ;;
                       
             odt)  
                 if [[ "$mimetype" == *"$odtstring"* ]];then
-                    pandoc -f odt "$infile" | lynx -stdin -lss=/home/steven/.lynx/lynx.lss
+                    pandoc -f odt "$infile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | lynx -stdin -lss=/home/steven/.lynx/lynx.lss
                 fi
                 ;;
 
             doc)  
                 if [[ "$mimetype" == *"$docstring"* ]];then
-                    wvWare "$infile" | lynx -stdin -lss=/home/steven/.lynx/lynx.lss 
+                    wvWare "$infile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | lynx -stdin -lss=/home/steven/.lynx/lynx.lss 
                 elif [[ "$mimetype" == *"$rtfstring"* ]];then
-                    unrtf --html "$tmpfile" | lynx -stdin -lss=/home/steven/.lynx/lynx.lss
+                    unrtf --html "$tmpfile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | lynx -stdin -lss=/home/steven/.lynx/lynx.lss
                 fi
                 ;;
             rtf)
                 if [[ "$mimetype" == *"$rtfstring"* ]];then
-                    unrtf --html "$tmpfile" | lynx -stdin -lss=/home/steven/.lynx/lynx.lss  
+                    unrtf --html "$tmpfile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | lynx -stdin -lss=/home/steven/.lynx/lynx.lss  
                 fi
                 ;;
             pdf) 
@@ -84,7 +88,7 @@ infile=$(realpath "$@")
                 ;;
             "md" | "mkd") 
                 if [[ "$mimetype" == *"$utf8string"* ]] || [[ "$mimetype" == *"$txtstring"* ]];then
-                    pandoc -s -f markdown -t html "$infile" | lynx -stdin -lss=/home/steven/.lynx/lynx.lss
+                    pandoc -s -f markdown -t html "$infile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | lynx -stdin -lss=/home/steven/.lynx/lynx.lss
                 fi
                 ;;
             "xhtml" | "htm" | "html" | "xml" ) 
@@ -123,6 +127,7 @@ infile=$(realpath "$@")
                 fi
                 ;;
             *)
+                bat "$infile" 
             ;;
                 
         esac
