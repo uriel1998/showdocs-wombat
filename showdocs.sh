@@ -27,12 +27,14 @@ xmlstring="XML 1.0 document"
 phpstring="PHP script"
 plstring="Perl script"
 
+InTmux=""
+
+
 function show_help() {
 
     echo "Usage: showdoc.sh $filename"
     echo "  -h = show this help"   
 }
-
 
 ##############################################################################
 # Determine what type of file we're looking at.

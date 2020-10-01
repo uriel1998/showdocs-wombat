@@ -34,5 +34,9 @@ This project is licensed under the MIT License. For the full license, see `LICEN
 
 ## 6. Usage
 
+Need to note sidebar and devour (particularly devour!) and example scripts
+
+xfce4-terminal --hide-menubar --geometry=80x43 -e "/home/steven/bin/showdocs %f"
+
 ## 7. TODO
 
