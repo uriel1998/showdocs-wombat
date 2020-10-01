@@ -3,13 +3,14 @@
 
 # There are a lot of commandline converters... but few that do just about everything.
 # This aims to standardize a LOT of them.
-# Displayable/convertable files:
+# It's also bespoke as heck; edit to use the programs you prefer
 # PDF
 # Markdown
 # DOC
 # DOCX
 # RTF
 # HTML
+# CSV
 
 tmpfile=$(mktemp)
 # Strings correlating to mimetypes for sanity check.
@@ -52,7 +53,8 @@ indir=$(dirname "$infile")
         mimetype=$(file "$filename" | awk -F ':' '{ print $2 }') 
         case "$extension" in
             csv)
-                pspg -s 11 --csv -f "$infile"
+                tabview "$infile"
+                #pspg -s 11 --csv -f "$infile"
                 ;;
             epub)
                 epy "$infile"
@@ -68,7 +70,6 @@ indir=$(dirname "$infile")
                     pandoc -f odt "$infile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | lynx -stdin -lss=/home/steven/.lynx/lynx.lss
                 fi
                 ;;
-
             doc)  
                 if [[ "$mimetype" == *"$docstring"* ]];then
                     wvWare "$infile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | lynx -stdin -lss=/home/steven/.lynx/lynx.lss 
