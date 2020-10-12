@@ -76,12 +76,13 @@ indir=$(dirname "$infile")
                 if [[ "$mimetype" == *"$docstring"* ]];then
                     wvWare "$infile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | lynx -stdin -lss=/home/steven/.lynx/lynx.lss 
                 elif [[ "$mimetype" == *"$rtfstring"* ]];then
-                    unrtf --html "$tmpfile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | lynx -stdin -lss=/home/steven/.lynx/lynx.lss
+                    unrtf --html "$infile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | lynx -stdin -lss=/home/steven/.lynx/lynx.lss
                 fi
                 ;;
             rtf)
+                echo "HERE"
                 if [[ "$mimetype" == *"$rtfstring"* ]];then
-                    unrtf --html "$tmpfile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | lynx -stdin -lss=/home/steven/.lynx/lynx.lss  
+                    unrtf --html "$infile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | lynx -stdin -lss=/home/steven/.lynx/lynx.lss  
                 fi
                 ;;
             pdf) 
