@@ -80,7 +80,6 @@ indir=$(dirname "$infile")
                 fi
                 ;;
             rtf)
-                echo "HERE"
                 if [[ "$mimetype" == *"$rtfstring"* ]];then
                     unrtf --html "$infile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | lynx -stdin -lss=/home/steven/.lynx/lynx.lss  
                 fi
@@ -110,22 +109,7 @@ indir=$(dirname "$infile")
                     bat "$infile" 
                 fi
                 ;;
-            rc) 
-                if [[ "$mimetype" == *"$utf8string"* ]] || [[ "$mimetype" == *"$txtstring"* ]];then
-                    bat "$infile" 
-                fi
-                ;;
-            txt) 
-                if [[ "$mimetype" == *"$utf8string"* ]] || [[ "$mimetype" == *"$txtstring"* ]];then
-                    bat "$infile" 
-                fi
-                ;;
-            sh) 
-                if [[ "$mimetype" == *"$utf8string"* ]] || [[ "$mimetype" == *"$txtstring"* ]];then
-                    bat "$infile" 
-                fi
-                ;;
-            conf) 
+            rc|txt|sh|conf) 
                 if [[ "$mimetype" == *"$utf8string"* ]] || [[ "$mimetype" == *"$txtstring"* ]];then
                     bat "$infile" 
                 fi

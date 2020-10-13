@@ -1,9 +1,4 @@
-# 
-
-
-![mpdq logo](https://raw.githubusercontent.com/uriel1998/mpdq/master/mpdq-open-graph.png "logo")
-
-![mpdq in actino](https://raw.githubusercontent.com/uriel1998/mpdq/master/mpdq.gif "mpdq in action")
+# showdocs-wombat
 
 
 ## Contents
@@ -19,6 +14,12 @@
 
 ## 1. About
 
+Very simply, this is a document viewer type version that plays a similar role 
+as mailcap and other such utilities. It is VERY specific about focusing on 
+documents (DOC,DOCX,md,CSV,etc).  
+
+It's currently VERY bespoke and I don't yet have all the helpers listed in the 
+dependencies.  See TODO below for some things I'm working on.
 
 ## 2. License
 
@@ -29,6 +30,7 @@ This project is licensed under the MIT License. For the full license, see `LICEN
 
 ## 4. Installation
 
+Copy the script into your $PATH.  Make sure the helpers are defined.
 
 ## 5. Setup
 
@@ -40,3 +42,7 @@ xfce4-terminal --hide-menubar --geometry=80x43 -e "/home/steven/bin/showdocs %f"
 
 ## 7. TODO
 
+* Config for what helpers to use
+* Detect tmux environment and use devour if possible
+* auto-check for binary defaults
+* use less/lessfilter/etc as a fallback, see https://www.miskatonic.org/2020/06/24/lessfilter/

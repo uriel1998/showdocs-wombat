@@ -1,5 +1,3 @@
-# 
-
 
 ![mpdq logo](https://raw.githubusercontent.com/uriel1998/mpdq/master/mpdq-open-graph.png "logo")
 
