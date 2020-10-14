@@ -16,7 +16,7 @@
 
 Very simply, this is a document viewer type version that plays a similar role 
 as mailcap and other such utilities. It is VERY specific about focusing on 
-documents (DOC,DOCX,md,CSV,etc).  
+documents (DOC,DOCX,md,CSV,sqlite,etc).  
 
 It's currently VERY bespoke and I don't yet have all the helpers listed in the 
 dependencies.  See TODO below for some things I'm working on.
@@ -42,6 +42,7 @@ xfce4-terminal --hide-menubar --geometry=80x43 -e "/home/steven/bin/showdocs %f"
 
 ## 7. TODO
 
+* determine by mimetype if extension not found
 * Config for what helpers to use
 * Detect tmux environment and use devour if possible
 * auto-check for binary defaults

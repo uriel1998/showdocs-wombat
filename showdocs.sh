@@ -26,6 +26,7 @@ htmlstring="HTML document"
 xmlstring="XML 1.0 document"
 phpstring="PHP script"
 plstring="Perl script"
+sqlite="SQLite 3.x database"
 
 InTmux=""
 
@@ -54,6 +55,11 @@ indir=$(dirname "$infile")
         extension=$(echo "${filename##*.}" | tr '[:upper:]' '[:lower:]')
         mimetype=$(file "$filename" | awk -F ':' '{ print $2 }') 
         case "$extension" in
+            sqlite)
+                bobarray=( $(sqlite3 places.sqlite '.tables') )
+                tablechoice=$(for d in "${bobarray[@]}"; do echo "$d" ; done | fzf)
+                sqlite3 -csv -header places.sqlite "select * from ${tablechoice}" | pspg --csv --csv-header=on --double-header
+                ;;
             csv)
                 tabview "$infile"
                 #pspg -s 11 --csv -f "$infile"
