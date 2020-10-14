@@ -1,5 +1,10 @@
 # showdocs-wombat
 
+The only cli document viewer with a wombat mascot.
+
+![showdocs logo](https://raw.githubusercontent.com/uriel1998/showdocs-wombat/master/showdocs-wombat-open-graph.png "logo")
+![mascot](https://raw.githubusercontent.com/uriel1998/showdocs-wombat/master/128_senor_wombat-open-graph.png "mascot")
+
 
 ## Contents
  1. [About](#1-about)
