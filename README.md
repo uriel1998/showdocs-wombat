@@ -26,6 +26,12 @@ dependencies.  See TODO below for some things I'm working on.
 This project is licensed under the MIT License. For the full license, see `LICENSE`.
 
 ## 3. Prerequisites
+pspg (tested with version 3.1.4, the version in debian stable doesn't work with CSV natively)
+fzf
+awk
+sed
+file
+mysql
 
 
 ## 4. Installation
@@ -42,6 +48,8 @@ xfce4-terminal --hide-menubar --geometry=80x43 -e "/home/steven/bin/showdocs %f"
 
 ## 7. TODO
 
+* Further set up database viewing
+    - mysql -uUSER -pPASS -e "SHOW DATABASES" | tail -n +3 | sed 's/|//g'
 * determine by mimetype if extension not found
 * Config for what helpers to use
 * Detect tmux environment and use devour if possible

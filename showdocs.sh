@@ -12,6 +12,7 @@
 # HTML
 # CSV
 
+
 tmpfile=$(mktemp)
 # Strings correlating to mimetypes for sanity check.
 docxstring="Microsoft Word 2007+"
@@ -37,6 +38,27 @@ function show_help() {
     echo "  -h = show this help"   
 }
 
+function parse_mysql() {
+
+    mysqldbarray=( $(mysql -u${MYSQLU} -p${MYSQLP} -B -e "SHOW DATABASES" | tail -n +2 ) )
+    mysqldbchoice=$(for d in "${mysqldbarray[@]}"; do echo "$d" ; done | fzf)
+    mysqltablearray=( $(mysql -u${MYSQLU} -p${MYSQLP} -B -e "SHOW tables IN ${mysqldbchoice}" | tail -n +2 ) )
+    mysqltablearray+=(echo "Show keys of selected table (multiselect)")
+    tablechoice=$(for d in "${mysqldbarray[@]}"; do echo "$d" ; done | fzf --multi )
+    KeySelector=$(echo "${tablechoice}" | -c grep "Show keys of selected table" )
+    
+    if [ ${KeySelector} -eq 0 ];then
+        # Show table desc
+        mysql -u${MYSQLU} -p${MYSQLP} -B -e "desc ${tablechoice}" ${mysqldbchoice} | pspg --tsv --csv-header=on
+    else
+        # SHOW THOSE KEYS
+        mysql -u${MYSQLU} -p${MYSQLP} -B -e "show keys from ${tablechoice}" ${mysqldbchoice} | pspg --tsv --csv-header=on
+    fi
+fi
+    
+}
+
+
 ##############################################################################
 # Determine what type of file we're looking at.
 # Yes, you have to check both ways; sometimes RTF/DOC/DOCX misrepresent
@@ -45,6 +67,14 @@ if [ "$1" == "-h" ];then
     show_help
     exit
 fi    
+
+if [ "$1" == "mysql" ];then
+    MYSQLU="$2"
+    MYSQLP="$3"
+    parse_mysql
+    exit
+fi
+
 
 infile=$(realpath "$@")
 indir=$(dirname "$infile")
