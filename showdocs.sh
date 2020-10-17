@@ -54,7 +54,7 @@ function parse_mysql() {
         # SHOW THOSE KEYS
         mysql -u${MYSQLU} -p${MYSQLP} -B -e "show keys from ${tablechoice}" ${mysqldbchoice} | pspg --tsv --csv-header=on
     fi
-fi
+
     
 }
 
