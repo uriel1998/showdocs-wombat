@@ -109,7 +109,8 @@ show_text (){
 
 function show_help() {
     echo "Usage: showdoc.sh $filename"
-    echo "  -h = show this help"   
+    echo "  -h = show this help"
+    echo "  To view mysql, showdoc.sh mysql [USERNAME] [PASSWORD}"   
 }
 
 
@@ -146,8 +147,12 @@ fi
 if [ "$1" == "mysql" ];then
     MYSQLU="$2"
     MYSQLP="$3"
-    parse_mysql
-    exit
+    if [ -z "$2" ] || [ -z "$3" ];then
+        show_help
+    else
+        parse_mysql
+        exit
+    fi
 fi
 
 
@@ -173,8 +178,9 @@ indir=$(dirname "$infile")
             rtf) show_rtf ;;
             pdf) show_pdf ;; 
             "md" | "mkd") show_markdown ;; 
-            "xhtml" | "htm" | "html" | "xml" ) show_html ;;
+            "xhtml" | "htm" | "html" ) show_html ;;
             py) show_text ;;
+            xml) show_text ;;
             pl) show_text ;;
             rc|txt|sh|conf) show_text ;;
             *)
@@ -184,7 +190,7 @@ indir=$(dirname "$infile")
                 *PDF*document*) show_pdf ;;
                 *Rich*Text*Format*) show_rtf ;;
                 *HTML*document* ) show_html ;;
-                *XML*document* ) show_html ;;
+                *XML*document* ) show_text ;;
                 *SQLite*database* ) show_sqlite ;;
                 *tar*archive*gzip* ) show_archive ;;
                 *tar*archive*      ) show_archive ;;
