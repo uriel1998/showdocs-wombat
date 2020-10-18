@@ -48,6 +48,7 @@ This includes all of the helpers as well.
 * unrtf
 * pdftotext
 * bat
+* dtrx 
 
 ## 4. Installation
 
@@ -75,6 +76,7 @@ for "View" for markdown files is:
 
 ## 6. TODO
 
+* View the files in the archive, not just the list of the files IN the archive
 * Further set up database viewing for postgres
 * determine by mimetype if extension not found (maybe move crap to functions?)
 * Config for what helpers to use

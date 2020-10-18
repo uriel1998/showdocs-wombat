@@ -54,8 +54,6 @@ function parse_mysql() {
         # SHOW THOSE KEYS
         mysql -u${MYSQLU} -p${MYSQLP} -B -e "show keys from ${tablechoice}" ${mysqldbchoice} | pspg --tsv --csv-header=on
     fi
-
-    
 }
 
 
@@ -85,10 +83,17 @@ indir=$(dirname "$infile")
         extension=$(echo "${filename##*.}" | tr '[:upper:]' '[:lower:]')
         mimetype=$(file "$filename" | awk -F ':' '{ print $2 }') 
         case "$extension" in
+            
+             tgz|bz2|gz|zip|arj|rar)
+                dtrx -l "${infile}" | bat
+                ;;
+            deb|rpm)
+                dtrx -l "${infile}" | bat
+                ;;
             sqlite)
-                bobarray=( $(sqlite3 places.sqlite '.tables') )
+                bobarray=( $(sqlite3 "$infile" '.tables') )
                 tablechoice=$(for d in "${bobarray[@]}"; do echo "$d" ; done | fzf)
-                sqlite3 -csv -header places.sqlite "select * from ${tablechoice}" | pspg --csv --csv-header=on --double-header
+                sqlite3 -csv -header "$infile" "select * from ${tablechoice}" | pspg --csv --csv-header=on --double-header
                 ;;
             csv)
                 tabview "$infile"
@@ -101,8 +106,7 @@ indir=$(dirname "$infile")
                 if [[ "$mimetype" == *"$docxstring"* ]];then
                     pandoc -f docx "$infile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | lynx -stdin -lss=/home/steven/.lynx/lynx.lss
                 fi
-                ;;
-                      
+                ;;                      
             odt)  
                 if [[ "$mimetype" == *"$odtstring"* ]];then
                     pandoc -f odt "$infile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | lynx -stdin -lss=/home/steven/.lynx/lynx.lss
