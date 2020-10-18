@@ -1,5 +1,12 @@
 #!/bin/bash
 
+##############################################################################
+#  showdocs-wombat 
+#  (c) Steven Saus 2020
+#  Licensed under the MIT license
+#
+##############################################################################
+
 
 # There are a lot of commandline converters... but few that do just about everything.
 # This aims to standardize a LOT of them.
@@ -14,7 +21,12 @@
 
 
 tmpfile=$(mktemp)
-# Strings correlating to mimetypes for sanity check.
+
+InTmux=""
+
+##############################################################################
+# Mimetype Strings
+##############################################################################
 docxstring="Microsoft Word 2007+"
 pystring="Python script"  # Do we want to have syntax highlighting? 
 txtstring="ASCII text"
@@ -29,14 +41,81 @@ phpstring="PHP script"
 plstring="Perl script"
 sqlite="SQLite 3.x database"
 
-InTmux=""
+##############################################################################
+# Displaying functions
+#
+# This is the bit to edit if you wish to change the viewers 
+#
+##############################################################################
 
+show_archive (){
+    dtrx -l "${infile}" | bat
+}
+
+show_sqlite (){
+    bobarray=( $(sqlite3 "$infile" '.tables') )
+    tablechoice=$(for d in "${bobarray[@]}"; do echo "$d" ; done | fzf)
+    sqlite3 -csv -header "$infile" "select * from ${tablechoice}" | pspg --csv --csv-header=on --double-header
+}
+
+show_docx (){
+    pandoc -f docx "$infile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | lynx -stdin -lss=/home/steven/.lynx/lynx.lss
+}
+
+show_doc (){
+    if [[ "$mimetype" == *"$docstring"* ]];then
+        wvWare "$infile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | lynx -stdin -lss=/home/steven/.lynx/lynx.lss 
+    elif [[ "$mimetype" == *"$rtfstring"* ]];then
+        unrtf --html "$infile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | lynx -stdin -lss=/home/steven/.lynx/lynx.lss
+    fi
+}
+
+show_odt (){
+    pandoc -f odt "$infile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | lynx -stdin -lss=/home/steven/.lynx/lynx.lss
+}
+
+show_rtf (){
+    unrtf --html "$infile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | lynx -stdin -lss=/home/steven/.lynx/lynx.lss
+}
+
+show_pdf (){
+    pdftotext -layout "$infile" "$tmpfile"; bat "$tmpfile"; rm "$tmpfile"
+}
+
+show_csv (){
+    tabview "$infile"
+}
+
+show_epub (){
+    epy "$infile"
+}
+
+show_html (){
+    lynx "$infile" -lss=/home/steven/.lynx/lynx.lss
+}
+
+show_markdown (){
+    pandoc -s -f markdown -t html "$infile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | lynx -stdin -lss=/home/steven/.lynx/lynx.lss
+}
+
+show_text (){
+    bat "$infile" 
+}
+
+
+##############################################################################
+# Show help
+##############################################################################
 
 function show_help() {
-
     echo "Usage: showdoc.sh $filename"
     echo "  -h = show this help"   
 }
+
+
+##############################################################################
+# Show mysql
+##############################################################################
 
 function parse_mysql() {
 
@@ -56,10 +135,8 @@ function parse_mysql() {
     fi
 }
 
-
 ##############################################################################
-# Determine what type of file we're looking at.
-# Yes, you have to check both ways; sometimes RTF/DOC/DOCX misrepresent
+# Main Function
 ##############################################################################
 if [ "$1" == "-h" ];then
     show_help
@@ -82,82 +159,40 @@ indir=$(dirname "$infile")
         #get extension, lowercase it
         extension=$(echo "${filename##*.}" | tr '[:upper:]' '[:lower:]')
         mimetype=$(file "$filename" | awk -F ':' '{ print $2 }') 
+
+        # Match extension first, since DOCX and XLSX give the same mimetype
         case "$extension" in
-            
-             tgz|bz2|gz|zip|arj|rar)
-                dtrx -l "${infile}" | bat
-                ;;
-            deb|rpm)
-                dtrx -l "${infile}" | bat
-                ;;
-            sqlite)
-                bobarray=( $(sqlite3 "$infile" '.tables') )
-                tablechoice=$(for d in "${bobarray[@]}"; do echo "$d" ; done | fzf)
-                sqlite3 -csv -header "$infile" "select * from ${tablechoice}" | pspg --csv --csv-header=on --double-header
-                ;;
-            csv)
-                tabview "$infile"
-                #pspg -s 11 --csv -f "$infile"
-                ;;
-            epub)
-                epy "$infile"
-                ;;
-            docx)  
-                if [[ "$mimetype" == *"$docxstring"* ]];then
-                    pandoc -f docx "$infile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | lynx -stdin -lss=/home/steven/.lynx/lynx.lss
-                fi
-                ;;                      
-            odt)  
-                if [[ "$mimetype" == *"$odtstring"* ]];then
-                    pandoc -f odt "$infile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | lynx -stdin -lss=/home/steven/.lynx/lynx.lss
-                fi
-                ;;
-            doc)  
-                if [[ "$mimetype" == *"$docstring"* ]];then
-                    wvWare "$infile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | lynx -stdin -lss=/home/steven/.lynx/lynx.lss 
-                elif [[ "$mimetype" == *"$rtfstring"* ]];then
-                    unrtf --html "$infile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | lynx -stdin -lss=/home/steven/.lynx/lynx.lss
-                fi
-                ;;
-            rtf)
-                if [[ "$mimetype" == *"$rtfstring"* ]];then
-                    unrtf --html "$infile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | lynx -stdin -lss=/home/steven/.lynx/lynx.lss  
-                fi
-                ;;
-            pdf) 
-                if [[ "$mimetype" == *"$pdfstring"* ]];then
-                    pdftotext -layout "$infile" "$tmpfile"; bat "$tmpfile"; rm "$tmpfile"
-                fi
-                ;;
-            "md" | "mkd") 
-                if [[ "$mimetype" == *"$utf8string"* ]] || [[ "$mimetype" == *"$txtstring"* ]];then
-                    pandoc -s -f markdown -t html "$infile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | lynx -stdin -lss=/home/steven/.lynx/lynx.lss
-                fi
-                ;;
-            "xhtml" | "htm" | "html" | "xml" ) 
-                if [[ "$mimetype" == *"$htmlstring"* ]];then
-                    lynx "$infile" -lss=/home/steven/.lynx/lynx.lss 
-                fi
-                ;;
-            py) 
-                if [[ "$mimetype" == *"$pystring"* ]];then
-                    bat "$infile" 
-                fi
-                ;;
-            pl) 
-                if [[ "$mimetype" == *"$plstring"* ]];then
-                    bat "$infile" 
-                fi
-                ;;
-            rc|txt|sh|conf) 
-                if [[ "$mimetype" == *"$utf8string"* ]] || [[ "$mimetype" == *"$txtstring"* ]];then
-                    bat "$infile" 
-                fi
-                ;;
+            tgz|bz2|gz|zip|arj|rar) show_archive ;;
+            deb|rpm) show_archive ;;
+            sqlite) show_sqlite ;;
+            csv) show_csv ;;
+            epub) show_epub ;;
+            docx) show_docx ;;          
+            odt) show_odt ;; 
+            doc) show_doc ;;
+            rtf) show_rtf ;;
+            pdf) show_pdf ;; 
+            "md" | "mkd") show_markdown ;; 
+            "xhtml" | "htm" | "html" | "xml" ) show_html ;;
+            py) show_text ;;
+            pl) show_text ;;
+            rc|txt|sh|conf) show_text ;;
             *)
-                bat "$infile" 
+                case "$mimetype" in
+                *Word*2007* ) show_docx ;;
+                *OpenDocument*Text*) show_odt ;;
+                *PDF*document*) show_pdf ;;
+                *Rich*Text*Format*) show_rtf ;;
+                *HTML*document* ) show_html ;;
+                *XML*document* ) show_html ;;
+                *SQLite*database* ) show_sqlite ;;
+                *tar*archive*gzip* ) show_archive ;;
+                *tar*archive*      ) show_archive ;;
+                *gzip*             ) show_archive ;;
+                *ARJ*archive*data* ) show_archive ;;
+                *zip*archive*file* ) show_archive ;;
+                *                  ) show_text ;;
+                esac 
             ;;
-                
         esac
     fi	
-

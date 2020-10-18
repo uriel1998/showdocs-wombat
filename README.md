@@ -25,6 +25,8 @@ documents (DOC,DOCX,md,CSV,sqlite,etc).
 It's currently VERY bespoke and I don't yet have all the helpers listed in the 
 dependencies.  See TODO below for some things I'm working on.
 
+Some inspiration taken from `mutt.octet.filter`.
+
 ## 2. License
 
 This project is licensed under the MIT License. For the full license, see `LICENSE`.
