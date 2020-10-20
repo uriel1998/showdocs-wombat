@@ -35,35 +35,45 @@ This project is licensed under the MIT License. For the full license, see `LICEN
 
 This includes all of the helpers as well.
 
-* pspg (tested with version 3.1.4, the version in debian stable doesn't work with CSV natively)
+* pspg https://github.com/okbob/pspg (tested with version 3.1.4 from *testing*, the version in debian stable doesn't work with CSV natively) https://packages.debian.org/source/bullseye/pspg
 * fzf
 * awk
 * sed
 * file
 * mysql
 * sqlite3
-* tabview
-* epy 
 * pandoc
 * lynx
-* wvWare
+* wvWare *wv*
 * unrtf
 * pdftotext
 * bat
 * dtrx 
 
+You can get these on Debian buster
+
+* tabview https://github.com/TabViewer/gtabview
+* epy  https://github.com/wustho/epy
+
+
+
 (optional)
-wmctrl
-xseticon
-devour
+* wmctrl
+* xseticon https://sourceforge.net/projects/xseticon/
+* devour https://uriel1998.github.io/tdab/
 
 ## 4. Installation
 
-Make a symlink into your path.
+Clone or download the repo. If downloaded it, unarchive it into a 
+directory, then make a symlink into your path.  
+
+Examine `showdocs.sh` to determine if the "helpers" are the ones you wish 
+to use. 
 
 ## 5. Usage
 
-Simply invoke the script as  
+
+The most basic usage is to invoke 
 
 `showdocs.sh [FILENAME]`
 
@@ -73,25 +83,29 @@ or
 
 for the mysql viewer.
 
-If you use tmux, [TDAB](https://uriel1998.github.io/tdab) may be useful. (this is being 
-built in to use it if it's available.
+If you invoke it under tmux and have [TDAB](https://uriel1998.github.io/tdab) 
+installed, the `devour` script will automatically be invoked, creating a new 
+maximized pane with your document in it.
 
-
-THE FOLLOWING IS BEING SUPERCEDED by the -g switch.
-
-Using a GUI viewer (such as [Double Commander](https://doublecmd.sourceforge.io/), 
-you may wish to invoke it as a terminal application.  For example, my definition 
-for "View" for markdown files is:
+The old way of calling this script from a GUI viewer (such as [Double Commander](https://doublecmd.sourceforge.io/)
+which spawned a new window was something like: 
 
 `xfce4-terminal --hide-menubar --geometry=80x43 -e "/home/steven/bin/showdocs %f"`
+
+That will still work, but you can simplify (and enhance) the experience by using 
+the -g switch, making the command something like this:
+
+`/home/steven/bin/showdocs -g %f`
+
+Not only will it launch a new xterm, but if you have `wmctrl` and `xseticon` set, 
+it will decorate the window with the script's icon and name.
+
 
 ## 6. TODO
 
 * View the files in the archive, not just the list of the files IN the archive
 * Further set up database viewing for postgres
-* determine by mimetype if extension not found (maybe move crap to functions?)
 * Config for what helpers to use
-* Detect tmux environment and use devour if possible
 * auto-check for binary defaults
 * use less/lessfilter/etc as a fallback, see https://www.miskatonic.org/2020/06/24/lessfilter/
 * installation example for midnight commander

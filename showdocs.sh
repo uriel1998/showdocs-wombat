@@ -20,8 +20,13 @@
 # CSV
 
 tmpfile=$(mktemp)
+
 # Referring to my devour script
 DevourBinary=$(which devour)
+if [ -z "$DevourBinary" ];
+    DevourBinary=$(which devour.sh)
+fi
+
 TerminalBinary=$(which xterm)
 
 #get installation directory
