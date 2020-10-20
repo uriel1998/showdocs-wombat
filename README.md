@@ -107,10 +107,15 @@ it will decorate the window with the script's icon and name.
 If you wish to colorize your output - particularly of sourcecode - you should 
 use `.lessfilter`.  There's a good tutorial at [Miskatonic.org](https://www.miskatonic.org/2020/06/24/lessfilter/).
 
+If it cannot find a match, and you have the URLPortal script from [newsbeuter-dangerzone](https://uriel1998.github.io/newsbeuter-dangerzone/) in $PATH - 
+see [this file](https://github.com/uriel1998/newsbeuter-dangerzone/blob/master/urlportal.sh) if you don't 
+care about the rest of the repository - it will then pass everything off to that 
+program.  In that way, it can handle a lot of other datatypes as well without 
+getting too complicated.  Feel free to substitute your own "mailcap" style 
+solution instead.
+
 ## 6. TODO
 
 * View the files in the archive, not just the list of the files IN the archive
 * Further set up database viewing for postgres
-* Config for what helpers to use
-* auto-check for binary defaults
 * installation example for midnight commander

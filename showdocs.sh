@@ -34,6 +34,7 @@ export SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 
 #This will be built by the script at runtime; do not alter!
 CommandString=""
+GUI="" #This is used if needed for URLPORTAL
 
 ##############################################################################
 # Mimetype Strings
@@ -180,6 +181,7 @@ fi
 
 # We've been called in an xterm
 if [ "$1" == "-+-" ];then
+    GUI=1  # storing in case we need to pass it to URLportal
     shift
     xterm_setup
 fi
@@ -205,7 +207,6 @@ if [ "$1" == "mysql" ];then
     fi
 fi
 
-
 infile=$(realpath "$@")
 indir=$(dirname "$infile")
 
@@ -215,7 +216,7 @@ indir=$(dirname "$infile")
         extension=$(echo "${filename##*.}" | tr '[:upper:]' '[:lower:]')
         mimetype=$(file "$filename" | awk -F ':' '{ print $2 }') 
 
-        # Match extension first, since DOCX and XLSX give the same mimetype
+        # Match extension first, since DOC and XLS give the same mimetype
         case "$extension" in
             tgz|bz2|gz|zip|arj|rar) show_archive ;;
             deb|rpm) show_archive ;;
@@ -232,22 +233,44 @@ indir=$(dirname "$infile")
             py) show_text ;;
             xml) show_text ;;
             pl) show_text ;;
-            rc|txt|sh|conf) show_text ;;
+            rc|txt|sh|conf|ini) show_text ;;
             *)
-                case "$mimetype" in
-                *Word*2007* ) show_docx ;;
-                *OpenDocument*Text*) show_odt ;;
-                *PDF*document*) show_pdf ;;
-                *Rich*Text*Format*) show_rtf ;;
-                *HTML*document* ) show_html ;;
-                *XML*document* ) show_text ;;
-                *SQLite*database* ) show_sqlite ;;
-                *tar*archive*gzip* ) show_archive ;;
-                *tar*archive*      ) show_archive ;;
-                *gzip*             ) show_archive ;;
-                *ARJ*archive*data* ) show_archive ;;
-                *zip*archive*file* ) show_archive ;;
-                *                  ) show_text ;;
+                # Try to match by mimetype instead
+                case "$mimetype" in     
+                *Python*script* )          show_text ;;
+                *PHP*script* )          show_text ;;
+                *Perl*script* )         show_text ;;
+                *Word*2007* )           show_docx ;;
+                *OpenDocument*Text*)    show_odt ;;
+                *PDF*document*)         show_pdf ;;
+                *Composite*Document*File*V2*) show_doc ;;
+                *Rich*Text*Format*)     show_rtf ;;
+                *HTML*document* )       show_html ;;
+                *XML*document* )        show_text ;;
+                *SQLite*database* )     show_sqlite ;;
+                *ASCII*text* )          show_text ;;
+                *UTF-8*Unicode*text*)   show_text ;;
+                *tar*archive*gzip* )    show_archive ;;
+                *tar*archive*      )    show_archive ;;
+                *gzip*             )    show_archive ;;
+                *ARJ*archive*data* )    show_archive ;;
+                *zip*archive*file* )    show_archive ;;
+                *                  )    # Tossing anything else to URLportal
+                                        UPBinary=$(which urlportal)
+                                        if [ -z "$UPBinary" ];then
+                                            UPBinary=$(which urlportal.sh)
+                                        fi
+                                        
+                                        if [ -f "$UPBinary" ];then
+                                            
+                                            if [ -z $GUI ];then
+                                                CommandString=$(printf "%s %s" "${UPBinary}" "-c ${infile}")
+                                            else
+                                                CommandString=$(printf "%s %s" "${UPBinary}" "-g ${infile}")
+                                            fi
+                                            nohup ${CommandString} 
+                                        fi
+                                        ;;
                 esac 
             ;;
         esac
