@@ -20,8 +20,6 @@
 # CSV
 
 tmpfile=$(mktemp)
-Gui=""
-InTmux=""
 # Referring to my devour script
 DevourBinary=$(which devour)
 TerminalBinary=$(which xterm)
@@ -113,13 +111,15 @@ show_text (){
 
 function xterm_setup() {
     
-    if [ $(which xseticon) ] && [ -f ${SCRIPTDIR}/showdocs-wombat-xterm-icon.png ];then
+    if [ $(which xseticon) ] && [ -f ${SCRIPT_DIR}/showdocs-wombat-xterm-icon.png ];then
         CommandString=$(printf "%s %s" "${CommandString}" 'snark=$(echo $WINDOWID);')
-        CommandString=$(printf "%s %s %s" "${CommandString}" 'xseticon -id $snark ' "${SCRIPTDIR}/showdocs-wombat-xterm-icon.png;")
+        CommandString=$(printf "%s %s %s" "${CommandString}" 'xseticon -id $snark ' "${SCRIPT_DIR}/showdocs-wombat-xterm-icon.png;")
+    fi
     if [ $(which wmctrl) ];then
         CommandString=$(printf "%s %s" "${CommandString}" 'snark=$(echo $WINDOWID);')
         CommandString=$(printf "%s %s %s" "${CommandString}" 'wmctrl -i -r $snark -T ShowDocs-Wombat;')
-    if
+    fi
+    eval ${CommandString}
 }
 
 ##############################################################################
@@ -129,7 +129,8 @@ function xterm_setup() {
 function show_help() {
     echo "Usage: showdoc.sh $filename"
     echo "  -h = show this help"
-    echo "  -g = implies called from a GUI, launch terminal first"
+    echo "  -g = implies called from a GUI, will launch own terminal"
+    echo "  Will also use devour script if available."
     echo "  To view mysql, showdoc.sh mysql [USERNAME] [PASSWORD}"   
 }
 
@@ -164,14 +165,28 @@ if [ "$1" == "-h" ];then
     exit
 fi    
 
+# If it's going to be a spawned terminal, we want to start setting it up now.
+# calling the process again in an xterm
 if [ "$1" == "-g" ];then
-    Gui=1
     shift
+    xterm -e "$SCRIPT_DIR/showdocs.sh -+- $@" &
+    exit
 fi
 
-c_tmux=$(env | grep -c TMUX)
-if [ $c_tmux -gt 0 ];then
-    InTmux=1
+# We've been called in an xterm
+if [ "$1" == "-+-" ];then
+    shift
+    xterm_setup
+fi
+
+if [ "$1" == "+-+" ];then #already in tmux, already re-called
+    shift
+else
+    c_tmux=$(env | grep -c TMUX)  # Are we in tmux?
+    if [ $c_tmux -gt 0 ] && [ ! -z "$DevourBinary" ];then #does devour exist?
+        "$DevourBinary" "$SCRIPT_DIR/showdocs.sh +-+ $@"  # re-call it in devour
+        exit
+    fi
 fi
 
 if [ "$1" == "mysql" ];then

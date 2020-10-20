@@ -52,9 +52,14 @@ This includes all of the helpers as well.
 * bat
 * dtrx 
 
+(optional)
+wmctrl
+xseticon
+devour
+
 ## 4. Installation
 
-Copy the script into your `$PATH`.  Make sure the helpers are defined.
+Make a symlink into your path.
 
 ## 5. Usage
 
@@ -68,7 +73,11 @@ or
 
 for the mysql viewer.
 
-If you use tmux, [TDAB](https://uriel1998.github.io/tdab) may be useful.
+If you use tmux, [TDAB](https://uriel1998.github.io/tdab) may be useful. (this is being 
+built in to use it if it's available.
+
+
+THE FOLLOWING IS BEING SUPERCEDED by the -g switch.
 
 Using a GUI viewer (such as [Double Commander](https://doublecmd.sourceforge.io/), 
 you may wish to invoke it as a terminal application.  For example, my definition 
