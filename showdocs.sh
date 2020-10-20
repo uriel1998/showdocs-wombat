@@ -23,7 +23,7 @@ tmpfile=$(mktemp)
 
 # Referring to my devour script
 DevourBinary=$(which devour)
-if [ -z "$DevourBinary" ];
+if [ -z "$DevourBinary" ];then
     DevourBinary=$(which devour.sh)
 fi
 
@@ -110,7 +110,7 @@ show_markdown (){
 }
 
 show_text (){
-    bat "$infile" 
+    bat --paging=always "$infile" 
 }
 
 
