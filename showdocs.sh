@@ -60,7 +60,7 @@ sqlite="SQLite 3.x database"
 ##############################################################################
 
 show_archive (){
-    dtrx -l "${infile}" | bat
+    dtrx -l "${infile}" | bat --paging=always 
 }
 
 show_sqlite (){

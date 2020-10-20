@@ -35,39 +35,43 @@ This project is licensed under the MIT License. For the full license, see `LICEN
 
 This includes all of the helpers as well.
 
-* pspg https://github.com/okbob/pspg (tested with version 3.1.4 from *testing*, the version in debian stable doesn't work with CSV natively) https://packages.debian.org/source/bullseye/pspg
-* fzf
-* awk
-* sed
-* file
-* mysql
-* sqlite3
-* pandoc
-* lynx
-* wvWare *wv*
-* unrtf
-* pdftotext
-* bat
+The following can be installed on Debian Buster or Bullseye (and probably Ubuntu) 
+by typing 
+
+`sudo apt update;sudo apt-get install fzf awk sed file mysql sqlite3 pandoc lynx wv unrtf pdftotext bat dtrx`
+
+* fzf  
+* awk  
+* sed  
+* file  
+* mysql  
+* sqlite3  
+* pandoc  
+* lynx  
+* wvWare 
+* unrtf  
+* pdftotext  
+* bat  
 * dtrx 
 
-You can get these on Debian buster
+These require a little more effort:
 
-* tabview https://github.com/TabViewer/gtabview
-* epy  https://github.com/wustho/epy
+* [pspg](https://github.com/okbob/pspg) - You need version 3.1.4 or up, which is in [Debian Bullseye](https://packages.debian.org/source/bullseye/pspg)  
+* [tabview](https://github.com/TabViewer/gtabview)  
+* [epy](https://github.com/wustho/epy)  
 
+These are *really* optional:
 
-
-(optional)
-* wmctrl
-* xseticon https://sourceforge.net/projects/xseticon/
-* devour https://uriel1998.github.io/tdab/
+* wmctrl - `sudo apt install wmctrl`  
+* [xseticon](https://sourceforge.net/projects/xseticon/)  
+* [devour - from TDAB](https://uriel1998.github.io/tdab/)  
 
 ## 4. Installation
 
 Clone or download the repo. If downloaded it, unarchive it into a 
 directory, then make a symlink into your path.  
 
-Examine `showdocs.sh` to determine if the "helpers" are the ones you wish 
+Examine `showdocs.sh` to determine if the "helpers" I use are the ones you wish 
 to use. 
 
 ## 5. Usage
@@ -100,6 +104,8 @@ the -g switch, making the command something like this:
 Not only will it launch a new xterm, but if you have `wmctrl` and `xseticon` set, 
 it will decorate the window with the script's icon and name.
 
+If you wish to colorize your output - particularly of sourcecode - you should 
+use `.lessfilter`.  There's a good tutorial at [Miskatonic.org](https://www.miskatonic.org/2020/06/24/lessfilter/).
 
 ## 6. TODO
 
@@ -107,5 +113,4 @@ it will decorate the window with the script's icon and name.
 * Further set up database viewing for postgres
 * Config for what helpers to use
 * auto-check for binary defaults
-* use less/lessfilter/etc as a fallback, see https://www.miskatonic.org/2020/06/24/lessfilter/
 * installation example for midnight commander
