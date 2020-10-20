@@ -19,10 +19,18 @@
 # HTML
 # CSV
 
-
 tmpfile=$(mktemp)
-
+Gui=""
 InTmux=""
+# Referring to my devour script
+DevourBinary=$(which devour)
+TerminalBinary=$(which xterm)
+
+#get installation directory
+export SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+
+#This will be built by the script at runtime; do not alter!
+CommandString=""
 
 ##############################################################################
 # Mimetype Strings
@@ -103,6 +111,17 @@ show_text (){
 }
 
 
+function xterm_setup() {
+    
+    if [ $(which xseticon) ] && [ -f ${SCRIPTDIR}/showdocs-wombat-xterm-icon.png ];then
+        CommandString=$(printf "%s %s" "${CommandString}" 'snark=$(echo $WINDOWID);')
+        CommandString=$(printf "%s %s %s" "${CommandString}" 'xseticon -id $snark ' "${SCRIPTDIR}/showdocs-wombat-xterm-icon.png;")
+    if [ $(which wmctrl) ];then
+        CommandString=$(printf "%s %s" "${CommandString}" 'snark=$(echo $WINDOWID);')
+        CommandString=$(printf "%s %s %s" "${CommandString}" 'wmctrl -i -r $snark -T ShowDocs-Wombat;')
+    if
+}
+
 ##############################################################################
 # Show help
 ##############################################################################
@@ -110,6 +129,7 @@ show_text (){
 function show_help() {
     echo "Usage: showdoc.sh $filename"
     echo "  -h = show this help"
+    echo "  -g = implies called from a GUI, launch terminal first"
     echo "  To view mysql, showdoc.sh mysql [USERNAME] [PASSWORD}"   
 }
 
@@ -143,6 +163,16 @@ if [ "$1" == "-h" ];then
     show_help
     exit
 fi    
+
+if [ "$1" == "-g" ];then
+    Gui=1
+    shift
+fi
+
+c_tmux=$(env | grep -c TMUX)
+if [ $c_tmux -gt 0 ];then
+    InTmux=1
+fi
 
 if [ "$1" == "mysql" ];then
     MYSQLU="$2"
