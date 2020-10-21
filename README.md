@@ -54,6 +54,12 @@ by typing
 * bat  
 * dtrx 
 
+* csvtool (sudo apt)
+* unoconv (sudo apt)
+* csvkit (pip install ) - in2csv
+* xlsx2csv (pip install) 
+
+
 These require a little more effort:
 
 * [pspg](https://github.com/okbob/pspg) - You need version 3.1.4 or up, which is in [Debian Bullseye](https://packages.debian.org/source/bullseye/pspg)  

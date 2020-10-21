@@ -94,6 +94,30 @@ show_pdf (){
     pdftotext -layout "$infile" "$tmpfile"; bat "$tmpfile"; rm "$tmpfile"
 }
 
+show_ods (){
+    soffice --headless --convert-to csv filename.ods
+    unoconv -f csv -o [FILE TO BE READ] [ORIGINAL FILE]
+    #gnumeric
+    ssconvert book.ods file.csv
+}
+
+show_json () {
+    
+    echo "[$(cat ./AUTOSAVE.json)]" | in2csv -I -f json | csvtool transpose - > tmp.csv
+}
+
+show_excel (){
+    #gnumeric
+    ssconvert book.xlsx file.csv
+    #libreoffice
+    unoconv -f csv -o [FILE TO BE READ] [ORIGINAL FILE]
+    #pip install csvkit
+    #in2csv csv, dbf, fixed, geojson, json, ndjson, xls, xlsx
+    in2csv Classeur2.xlsx > book3.csv   
+    #https://pypi.python.org/pypi/xlsx2csv/  (pip install xlsx2csv)
+    xlsx2csv class.xlsx --all > allsheet.csv
+}
+
 show_csv (){
     tabview "$infile"
 }
