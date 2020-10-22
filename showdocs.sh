@@ -71,23 +71,23 @@ show_sqlite (){
 }
 
 show_docx (){
-    pandoc -f docx "$infile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | lynx -stdin -lss=/home/steven/.lynx/lynx.lss
+    pandoc -f docx "$infile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | lynx -stdin -lss=$HOME/.lynx/lynx.lss
 }
 
 show_doc (){
     if [[ "$mimetype" == *"$docstring"* ]];then
-        wvWare "$infile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | lynx -stdin -lss=/home/steven/.lynx/lynx.lss 
+        wvWare "$infile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | lynx -stdin -lss=$HOME/.lynx/lynx.lss 
     elif [[ "$mimetype" == *"$rtfstring"* ]];then
-        unrtf --html "$infile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | lynx -stdin -lss=/home/steven/.lynx/lynx.lss
+        unrtf --html "$infile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | lynx -stdin -lss=$HOME/.lynx/lynx.lss
     fi
 }
 
 show_odt (){
-    pandoc -f odt "$infile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | lynx -stdin -lss=/home/steven/.lynx/lynx.lss
+    pandoc -f odt "$infile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | lynx -stdin -lss=$HOME/.lynx/lynx.lss
 }
 
 show_rtf (){
-    unrtf --html "$infile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | lynx -stdin -lss=/home/steven/.lynx/lynx.lss
+    unrtf --html "$infile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | lynx -stdin -lss=$HOME/.lynx/lynx.lss
 }
 
 show_pdf (){
@@ -95,27 +95,50 @@ show_pdf (){
 }
 
 show_ods (){
-    soffice --headless --convert-to csv filename.ods
-    unoconv -f csv -o [FILE TO BE READ] [ORIGINAL FILE]
-    #gnumeric
-    ssconvert book.ods file.csv
+    
+    tmpfile2=""
+    if [ $(which ssconvert) ];then
+        tmpfile2=$(mktemp /tmp/showdocs-wombat.XXXXXXXXXXXXXXXXXXX.csv)
+        #gnumeric is quickest
+        ssconvert "$infile" "$tmpfile2"
+    elif [ $(which soffice) ];then
+        tmpfile2=$(mktemp /tmp/showdocs-wombat.XXXXXXXXXXXXXXXXXXX.csv)
+        #libreoffice headless also works
+        soffice --headless --convert-to csv "$infile" "$tmpfile2"
+    fi
+    if [ ! -z "$tmpfile2" ];then
+        tabview "$tmpfile2"
+        rm "$tmpfile2"
+    fi
 }
 
 show_json () {
-    
-    echo "[$(cat ./AUTOSAVE.json)]" | in2csv -I -f json | csvtool transpose - > tmp.csv
+
+    echo "[$(cat "$infile")]" | in2csv -I -f json | csvtool transpose - | tabview -
 }
 
 show_excel (){
-    #gnumeric
-    ssconvert book.xlsx file.csv
-    #libreoffice
-    unoconv -f csv -o [FILE TO BE READ] [ORIGINAL FILE]
-    #pip install csvkit
-    #in2csv csv, dbf, fixed, geojson, json, ndjson, xls, xlsx
-    in2csv Classeur2.xlsx > book3.csv   
-    #https://pypi.python.org/pypi/xlsx2csv/  (pip install xlsx2csv)
-    xlsx2csv class.xlsx --all > allsheet.csv
+
+    tmpfile2=""
+    if [ $(which in2csv) ];then
+        in2csv "$infile" | tabview -    
+        return
+    elif [ $(which xlsx2csv) ];then
+        xlsx2csv "$infile" --all | tabview -
+        return    
+    elif [ $(which ssconvert) ];then
+        tmpfile2=$(mktemp /tmp/showdocs-wombat.XXXXXXXXXXXXXXXXXXX.csv)
+        #gnumeric is quickest
+        ssconvert "$infile" "$tmpfile2"
+    elif [ $(which soffice) ];then
+        tmpfile2=$(mktemp /tmp/showdocs-wombat.XXXXXXXXXXXXXXXXXXX.csv)
+        #libreoffice headless also works
+        soffice --headless --convert-to csv "$infile" "$tmpfile2"
+    fi
+    if [ ! -z "$tmpfile2" ];then
+        tabview "$tmpfile2"
+        rm "$tmpfile2"
+    fi    
 }
 
 show_csv (){
@@ -127,11 +150,11 @@ show_epub (){
 }
 
 show_html (){
-    lynx "$infile" -lss=/home/steven/.lynx/lynx.lss
+    lynx "$infile" -lss=$HOME/.lynx/lynx.lss
 }
 
 show_markdown (){
-    pandoc -s -f markdown -t html "$infile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | lynx -stdin -lss=/home/steven/.lynx/lynx.lss
+    pandoc -s -f markdown -t html "$infile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | lynx -stdin -lss=$HOME/.lynx/lynx.lss
 }
 
 show_text (){
@@ -252,6 +275,8 @@ indir=$(dirname "$infile")
             doc) show_doc ;;
             rtf) show_rtf ;;
             pdf) show_pdf ;; 
+            xls|xlsx ) show_excel ;;
+            ods ) show_ods ;;
             "md" | "mkd") show_markdown ;; 
             "xhtml" | "htm" | "html" ) show_html ;;
             py) show_text ;;
