@@ -91,7 +91,27 @@ show_rtf (){
 }
 
 show_pdf (){
-    pdftotext -layout "$infile" "$tmpfile"; bat "$tmpfile"; rm "$tmpfile"
+    
+    pdftotext -nopgbrk -layout -nodiag "$infile" "$tmpfile"
+
+    # If it is not in its own xterm, why do any of this?
+    if [ "$GUI" == "1" ];then
+        MaxWidth=$(wc -L "$tmpfile" | awk '{print $1}')
+        if [ "$MaxWidth" -gt "$COLUMNS" ];then
+            if [ $(which wmctrl) ];then
+                CommandString=$(printf "%s %s" "${CommandString}" 'snark=$(echo $WINDOWID);')
+                CommandString=$(printf "%s %s %s" "${CommandString}" 'wmctrl -i -r $snark -e '0,-1,-1,1200,-1';')
+                eval ${CommandString}
+            fi
+        fi
+    fi
+
+    bat --decorations never "$tmpfile"; rm "$tmpfile"
+
+#TODO- use this to look for spaces (and therefore columns) in pdf output
+# grep -o ' ' | wc -l 
+# but need to find matches PER line, it's teh wrong grep output for that.
+    
 }
 
 show_ods (){
