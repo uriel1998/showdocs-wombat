@@ -35,7 +35,7 @@ export SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 #This will be built by the script at runtime; do not alter!
 CommandString=""
 GUI="" #This is used if needed for URLPORTAL
-
+TMUX="" #This is used if needed to determine what web browser to use
 ##############################################################################
 # Mimetype Strings
 ##############################################################################
@@ -71,23 +71,23 @@ show_sqlite (){
 }
 
 show_docx (){
-    pandoc -f docx "$infile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | lynx -stdin -lss=$HOME/.lynx/lynx.lss
+    pandoc -f docx "$infile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | eval "$browsercommand"
 }
 
 show_doc (){
-    if [[ "$mimetype" == *"$docstring"* ]];then
-        wvWare "$infile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | lynx -stdin -lss=$HOME/.lynx/lynx.lss 
+    if [[ "$mimetype" == *"$docstring"* ]];then        
+        wvWare "$infile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | eval "$browsercommand"
     elif [[ "$mimetype" == *"$rtfstring"* ]];then
-        unrtf --html "$infile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | lynx -stdin -lss=$HOME/.lynx/lynx.lss
+        unrtf --html "$infile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | eval "$browsercommand"
     fi
 }
 
 show_odt (){
-    pandoc -f odt "$infile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | lynx -stdin -lss=$HOME/.lynx/lynx.lss
+    pandoc -f odt "$infile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | eval "$browsercommand"
 }
 
 show_rtf (){
-    unrtf --html "$infile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | lynx -stdin -lss=$HOME/.lynx/lynx.lss
+    unrtf --html "$infile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | eval "$browsercommand"
 }
 
 show_pdf (){
@@ -170,11 +170,11 @@ show_epub (){
 }
 
 show_html (){
-    cat "${infile}" | lynx -stdin -lss=$HOME/.lynx/lynx.lss
+    cat "${infile}" | eval "$browsercommand"
 }
 
 show_markdown (){
-    pandoc -s -f markdown -t html "$infile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | lynx -stdin -lss=$HOME/.lynx/lynx.lss
+    pandoc -s -f markdown -t html "$infile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | eval "$browsercommand"
 }
 
 show_text (){
@@ -258,10 +258,12 @@ if [ "$1" == "-+-" ];then
     xterm_setup
 fi
 
+browsercommand=$(echo "lynx -stdin -lss=$HOME/.lynx/lynx.lss")
 
 if [ -z "$GUI" ];then
     # The other variables should have already been used up 
-    if [ "$1" == "+-+" ];then #already in tmux, already re-called
+    if [ "$1" == "+-+" ];then #already in tmux, already re-called, and devour exists
+        browsercommand=$(echo "w3m -T text/html")
         shift
     else
         c_tmux=$(env | grep -c TMUX)  # Are we in tmux?

@@ -83,6 +83,7 @@ by typing
 * dtrx 
 * csvtool
 * gnumeric
+* w3m
 
 ### Install via Apt, but check the version.
 
@@ -126,6 +127,9 @@ The program can handle *most* unescaped filenames - see the demo - but some spec
 characters (such as #) must still be escaped, like so:
 
 `showdocs.sh "[FILENAME]"`
+
+Occasionally a different viewer is invoked - such as when the `devour` function 
+is used inside `tmux`.  That is usually for aesthetic reasons (such as line wrapping).
 
 ### Viewing MySQL
 
