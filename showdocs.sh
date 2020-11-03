@@ -218,15 +218,15 @@ function parse_mysql() {
     mysqldbchoice=$(for d in "${mysqldbarray[@]}"; do echo "$d" ; done | fzf)
     mysqltablearray=( $(mysql -u${MYSQLU} -p${MYSQLP} -B -e "SHOW tables IN ${mysqldbchoice}" | tail -n +2 ) )
     mysqltablearray+=(echo "Show keys of selected table (multiselect)")
-    tablechoice=$(for d in "${mysqldbarray[@]}"; do echo "$d" ; done | fzf --multi )
-    KeySelector=$(echo "${tablechoice}" | -c grep "Show keys of selected table" )
-    
+    tablechoice=$(for d in "${mysqltablearray[@]}"; do echo "$d" ; done | fzf --multi )
+    KeySelector=$(echo "$tablechoice" | grep -c "Show keys of selected table" )
+    RealTableChoice=$(echo "$tablechoice" | grep -v "Show keys of selected table")
     if [ ${KeySelector} -eq 0 ];then
         # Show table desc
-        mysql -u${MYSQLU} -p${MYSQLP} -B -e "desc ${tablechoice}" ${mysqldbchoice} | pspg --tsv --csv-header=on
+        mysql -u${MYSQLU} -p${MYSQLP} -B -e "desc ${RealTableChoice}" ${mysqldbchoice} | pspg --tsv --csv-header=on
     else
         # SHOW THOSE KEYS
-        mysql -u${MYSQLU} -p${MYSQLP} -B -e "show keys from ${tablechoice}" ${mysqldbchoice} | pspg --tsv --csv-header=on
+        mysql -u${MYSQLU} -p${MYSQLP} -B -e "show keys from ${RealTableChoice}" ${mysqldbchoice} | pspg --tsv --csv-header=on
     fi
 }
 
@@ -244,7 +244,6 @@ fi
 if [ "$1" == "-g" ];then
     shift
     FunkyPath=$(echo "$@" | sed 's/#/\\#/g')
-    #echo "$FunkyPath"
     xterm -e "$SCRIPT_DIR/showdocs.sh -+- $FunkyPath" &
     exit
 fi
@@ -269,7 +268,6 @@ if [ -z "$GUI" ];then
         c_tmux=$(env | grep -c TMUX)  # Are we in tmux?
         if [ $c_tmux -gt 0 ] && [ ! -z "$DevourBinary" ];then #does devour exist?
             FunkyPath=$(echo "$@" | sed 's/#/\\#/g')
-            #echo "$FunkyPath"
             "$DevourBinary" "$SCRIPT_DIR/showdocs.sh +-+ $FunkyPath"  # re-call it in devour
             exit
         fi
@@ -293,7 +291,6 @@ FunkyPath=$(echo "$@")
 cmdstring=$(printf "realpath \"%s\"" "$FunkyPath")
 infile=$(eval "$cmdstring")
 indir=$(dirname "$infile")
-echo "$FunkyPath"
     if [ -f "$infile" ]; then
         filename=$(basename "$infile")
         #get extension, lowercase it
