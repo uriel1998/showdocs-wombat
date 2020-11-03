@@ -122,6 +122,11 @@ The most basic usage is to invoke
 
 `showdocs.sh [FILENAME]`
 
+The program can handle *most* unescaped filenames - see the demo - but some special 
+characters (such as #) must still be escaped, like so:
+
+`showdocs.sh "[FILENAME]"`
+
 ### Viewing MySQL
 
 To invoke the MySQL viewer, the command should be:

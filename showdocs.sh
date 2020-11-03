@@ -230,6 +230,7 @@ function parse_mysql() {
     fi
 }
 
+
 ##############################################################################
 # Main Function
 ##############################################################################
@@ -242,10 +243,13 @@ fi
 # calling the process again in an xterm
 if [ "$1" == "-g" ];then
     shift
-    FunkyPath=$(echo "$@")
+    FunkyPath=$(echo "$@" | sed 's/#/\\#/g')
+    #echo "$FunkyPath"
     xterm -e "$SCRIPT_DIR/showdocs.sh -+- $FunkyPath" &
     exit
 fi
+
+
 
 # We've been called in an xterm
 if [ "$1" == "-+-" ];then
@@ -254,13 +258,19 @@ if [ "$1" == "-+-" ];then
     xterm_setup
 fi
 
-if [ "$1" == "+-+" ];then #already in tmux, already re-called
-    shift
-else
-    c_tmux=$(env | grep -c TMUX)  # Are we in tmux?
-    if [ $c_tmux -gt 0 ] && [ ! -z "$DevourBinary" ];then #does devour exist?
-        "$DevourBinary" "$SCRIPT_DIR/showdocs.sh +-+ $@"  # re-call it in devour
-        exit
+
+if [ -z "$GUI" ];then
+    # The other variables should have already been used up 
+    if [ "$1" == "+-+" ];then #already in tmux, already re-called
+        shift
+    else
+        c_tmux=$(env | grep -c TMUX)  # Are we in tmux?
+        if [ $c_tmux -gt 0 ] && [ ! -z "$DevourBinary" ];then #does devour exist?
+            FunkyPath=$(echo "$@" | sed 's/#/\\#/g')
+            #echo "$FunkyPath"
+            "$DevourBinary" "$SCRIPT_DIR/showdocs.sh +-+ $FunkyPath"  # re-call it in devour
+            exit
+        fi
     fi
 fi
 
@@ -275,12 +285,13 @@ if [ "$1" == "mysql" ];then
     fi
 fi
 
+
 # This is necessary so that if a filename is unescaped, it'll get fixed.
 FunkyPath=$(echo "$@")
 cmdstring=$(printf "realpath \"%s\"" "$FunkyPath")
 infile=$(eval "$cmdstring")
 indir=$(dirname "$infile")
-
+echo "$FunkyPath"
     if [ -f "$infile" ]; then
         filename=$(basename "$infile")
         #get extension, lowercase it
