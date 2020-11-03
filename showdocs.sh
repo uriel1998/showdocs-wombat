@@ -247,8 +247,6 @@ if [ "$1" == "-g" ];then
     exit
 fi
 
-notify-send "FUCK"
-
 # We've been called in an xterm
 if [ "$1" == "-+-" ];then
     GUI=1  # storing in case we need to pass it to URLportal
