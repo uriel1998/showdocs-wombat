@@ -120,7 +120,7 @@ show_ods (){
     if [ $(which ssconvert) ];then
         tmpfile2=$(mktemp /tmp/showdocs-wombat.XXXXXXXXXXXXXXXXXXX.csv)
         #gnumeric is quickest
-        ssconvert "$infile" "$tmpfile2"
+        ssconvert "$infile" "$tmpfile2" > /dev/null
     elif [ $(which soffice) ];then
         tmpfile2=$(mktemp /tmp/showdocs-wombat.XXXXXXXXXXXXXXXXXXX.csv)
         #libreoffice headless also works
