@@ -183,7 +183,7 @@ show_text (){
 
 
 function xterm_setup() {
-    
+    echo "${SCRIPT_DIR}"
     if [ $(which xseticon) ] && [ -f ${SCRIPT_DIR}/showdocs-wombat-xterm-icon.png ];then
         CommandString=$(printf "%s %s" "${CommandString}" 'snark=$(echo $WINDOWID);')
         CommandString=$(printf "%s %s %s" "${CommandString}" 'xseticon -id $snark ' "${SCRIPT_DIR}/showdocs-wombat-xterm-icon.png;")
@@ -243,15 +243,17 @@ fi
 if [ "$1" == "-g" ];then
     shift
     FunkyPath=$(echo "$@" | sed 's/#/\\#/g')
-    xterm -e "$SCRIPT_DIR/showdocs.sh -+- $FunkyPath" &
+    xterm -e "$SCRIPT_DIR/showdocs.sh -+- $SCRIPT_DIR $FunkyPath" &
     exit
 fi
 
-
+notify-send "FUCK"
 
 # We've been called in an xterm
 if [ "$1" == "-+-" ];then
     GUI=1  # storing in case we need to pass it to URLportal
+    shift
+    SCRIPT_DIR="$1"
     shift
     xterm_setup
 fi
