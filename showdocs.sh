@@ -170,7 +170,7 @@ show_epub (){
 }
 
 show_html (){
-    lynx "$infile" -lss=$HOME/.lynx/lynx.lss
+    cat "${infile}" | lynx -stdin -lss=$HOME/.lynx/lynx.lss
 }
 
 show_markdown (){
@@ -275,6 +275,7 @@ if [ "$1" == "mysql" ];then
 fi
 
 infile=$(realpath "$@")
+
 indir=$(dirname "$infile")
 
     if [ -f "$infile" ]; then
@@ -282,7 +283,7 @@ indir=$(dirname "$infile")
         #get extension, lowercase it
         extension=$(echo "${filename##*.}" | tr '[:upper:]' '[:lower:]')
         mimetype=$(file "$filename" | awk -F ':' '{ print $2 }') 
-
+        
         # Match extension first, since DOC and XLS give the same mimetype
         case "$extension" in
             tgz|bz2|gz|zip|arj|rar) show_archive ;;
