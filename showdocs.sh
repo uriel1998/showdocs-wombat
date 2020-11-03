@@ -242,7 +242,8 @@ fi
 # calling the process again in an xterm
 if [ "$1" == "-g" ];then
     shift
-    xterm -e "$SCRIPT_DIR/showdocs.sh -+- $@" &
+    FunkyPath=$(echo "$@")
+    xterm -e "$SCRIPT_DIR/showdocs.sh -+- $FunkyPath" &
     exit
 fi
 
@@ -274,8 +275,10 @@ if [ "$1" == "mysql" ];then
     fi
 fi
 
-infile=$(realpath "$@")
-
+# This is necessary so that if a filename is unescaped, it'll get fixed.
+FunkyPath=$(echo "$@")
+cmdstring=$(printf "realpath \"%s\"" "$FunkyPath")
+infile=$(eval "$cmdstring")
 indir=$(dirname "$infile")
 
     if [ -f "$infile" ]; then
