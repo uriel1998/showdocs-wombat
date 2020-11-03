@@ -350,7 +350,7 @@ indir=$(dirname "$infile")
                                             else
                                                 CommandString=$(printf "%s %s" "${UPBinary}" "-g ${infile}")
                                             fi
-                                            nohup ${CommandString} 
+                                            nohup ${CommandString} > /dev/null
                                         fi
                                         ;;
                 esac 
