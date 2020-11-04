@@ -5,6 +5,8 @@ The only cli document viewer with a wombat in a sombrero as a mascot.
 ![showdocs logo](https://raw.githubusercontent.com/uriel1998/showdocs-wombat/master/showdocs-wombat-open-graph.png "logo")
 ![mascot](https://github.com/uriel1998/showdocs-wombat/raw/master/128_senor_wombat.png "mascot")
 
+Demo on YouTube:
+[![Demo](https://img.youtube.com/vi/06JgZT1eP0E/0.jpg)](https://www.youtube.com/watch?v=06JgZT1eP0E)
 
 ## Contents
  1. [About](#1-about)
@@ -83,6 +85,7 @@ by typing
 * dtrx 
 * csvtool
 * gnumeric
+* w3m
 
 ### Install via Apt, but check the version.
 
@@ -121,6 +124,14 @@ to use.
 The most basic usage is to invoke 
 
 `showdocs.sh [FILENAME]`
+
+The program can handle *most* unescaped filenames - see the demo - but some special 
+characters (such as #) must still be escaped, like so:
+
+`showdocs.sh "[FILENAME]"`
+
+Occasionally a different viewer is invoked - such as when the `devour` function 
+is used inside `tmux`.  That is usually for aesthetic reasons (such as line wrapping).
 
 ### Viewing MySQL
 
