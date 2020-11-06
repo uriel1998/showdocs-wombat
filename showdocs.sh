@@ -20,12 +20,16 @@
 # CSV
 
 tmpfile=$(mktemp)
+inettmp=$(mktemp /tmp/showdocs-wombatXXXXXXXXXXXXXXXXXXX)
 
 # Referring to my devour script
 DevourBinary=$(which devour)
 if [ -z "$DevourBinary" ];then
     DevourBinary=$(which devour.sh)
 fi
+
+MunaBinary=$(which muna.sh)
+# For unredirecting URLs
 
 TerminalBinary=$(which xterm)
 
@@ -247,6 +251,7 @@ if [ "$1" == "-g" ];then
     exit
 fi
 
+
 # We've been called in an xterm
 if [ "$1" == "-+-" ];then
     GUI=1  # storing in case we need to pass it to URLportal
@@ -287,73 +292,112 @@ fi
 
 # This is necessary so that if a filename is unescaped, it'll get fixed.
 FunkyPath=$(echo "$@")
+
+#If it is a URL, download it, identify it, and then run through showdocs/URLPortal
+if [[ "$FunkyPath" =~ "https://" ]] || [[ "$FunkyPath" =~ "http://" ]];then
+    if [ ! -z "$MunaBinary" ];then
+        source "$MunaBinary"
+        url="${FunkyPath}"
+        unredirector
+        FunkyPath=$(echo "${url}")
+    fi
+    wget -q "${FunkyPath}" -O "$inettmp"
+    if [ -f "$inettmp" ];then
+        mt="$(mimetype -bM "$inettemp")"
+        ext="${mt##*/}"
+        ext="${ext##*/x-}"         # for mimetypes that have x- variations, like audio/midi and audio/x-midi
+        #type="${mt%%/*}"
+        case "$mt" in              # for mimetypes that are both audio and video
+            audio/mpeg*)
+                ext=$(echo "mp3")  #for clarification
+                ;;
+            video*)
+                ;;
+        esac
+        case "$ext" in
+            vnd.ms-asf) ext="wvm";;
+            msvideo) ext="avi";;
+            matroska) ext="mp4";;
+            quicktime) ext="mov" ;;
+        esac
+        echo mv -v "$inettemp" "$inettemp.$ext"
+        FunkyPath="${inettmp.$ext}"  # bringing us back in line with the rest of the flow
+    else
+        exit 2
+    fi
+fi
+    
 cmdstring=$(printf "realpath \"%s\"" "$FunkyPath")
 infile=$(eval "$cmdstring")
 indir=$(dirname "$infile")
-    if [ -f "$infile" ]; then
-        filename=$(basename "$infile")
-        #get extension, lowercase it
-        extension=$(echo "${filename##*.}" | tr '[:upper:]' '[:lower:]')
-        mimetype=$(file "$filename" | awk -F ':' '{ print $2 }') 
-        
-        # Match extension first, since DOC and XLS give the same mimetype
-        case "$extension" in
-            tgz|bz2|gz|zip|arj|rar) show_archive ;;
-            deb|rpm) show_archive ;;
-            sqlite) show_sqlite ;;
-            csv) show_csv ;;
-            epub) show_epub ;;
-            docx) show_docx ;;          
-            odt) show_odt ;; 
-            doc) show_doc ;;
-            rtf) show_rtf ;;
-            pdf) show_pdf ;; 
-            xls|xlsx ) show_excel ;;
-            ods ) show_ods ;;
-            "md" | "mkd") show_markdown ;; 
-            "xhtml" | "htm" | "html" ) show_html ;;
-            py) show_text ;;
-            xml) show_text ;;
-            pl) show_text ;;
-            rc|txt|sh|conf|ini) show_text ;;
-            *)
-                # Try to match by mimetype instead
-                case "$mimetype" in     
-                *Python*script* )          show_text ;;
-                *PHP*script* )          show_text ;;
-                *Perl*script* )         show_text ;;
-                *Word*2007* )           show_docx ;;
-                *OpenDocument*Text*)    show_odt ;;
-                *PDF*document*)         show_pdf ;;
-                *Composite*Document*File*V2*) show_doc ;;
-                *Rich*Text*Format*)     show_rtf ;;
-                *HTML*document* )       show_html ;;
-                *XML*document* )        show_text ;;
-                *SQLite*database* )     show_sqlite ;;
-                *ASCII*text* )          show_text ;;
-                *UTF-8*Unicode*text*)   show_text ;;
-                *tar*archive*gzip* )    show_archive ;;
-                *tar*archive*      )    show_archive ;;
-                *gzip*             )    show_archive ;;
-                *ARJ*archive*data* )    show_archive ;;
-                *zip*archive*file* )    show_archive ;;
-                *                  )    # Tossing anything else to URLportal
-                                        UPBinary=$(which urlportal)
-                                        if [ -z "$UPBinary" ];then
-                                            UPBinary=$(which urlportal.sh)
+
+    
+if [ -f "$infile" ]; then
+    filename=$(basename "$infile")
+    #get extension, lowercase it
+    extension=$(echo "${filename##*.}" | tr '[:upper:]' '[:lower:]')
+    mimetype=$(file "$filename" | awk -F ':' '{ print $2 }') 
+    
+    # Match extension first, since DOC and XLS give the same mimetype
+    case "$extension" in
+        tgz|bz2|gz|zip|arj|rar) show_archive ;;
+        deb|rpm) show_archive ;;
+        sqlite) show_sqlite ;;
+        csv) show_csv ;;
+        epub) show_epub ;;
+        docx) show_docx ;;          
+        odt) show_odt ;; 
+        doc) show_doc ;;
+        rtf) show_rtf ;;
+        pdf) show_pdf ;; 
+        xls|xlsx ) show_excel ;;
+        ods ) show_ods ;;
+        "md" | "mkd") show_markdown ;; 
+        "xhtml" | "htm" | "html" ) show_html ;;
+        py) show_text ;;
+        xml) show_text ;;
+        pl) show_text ;;
+        rc|txt|sh|conf|ini) show_text ;;
+        *)
+            # Try to match by mimetype instead
+            case "$mimetype" in     
+            *Python*script* )          show_text ;;
+            *PHP*script* )          show_text ;;
+            *Perl*script* )         show_text ;;
+            *Word*2007* )           show_docx ;;
+            *OpenDocument*Text*)    show_odt ;;
+            *PDF*document*)         show_pdf ;;
+            *Composite*Document*File*V2*) show_doc ;;
+            *Rich*Text*Format*)     show_rtf ;;
+            *HTML*document* )       show_html ;;
+            *XML*document* )        show_text ;;
+            *SQLite*database* )     show_sqlite ;;
+            *ASCII*text* )          show_text ;;
+            *UTF-8*Unicode*text*)   show_text ;;
+            *tar*archive*gzip* )    show_archive ;;
+            *tar*archive*      )    show_archive ;;
+            *gzip*             )    show_archive ;;
+            *ARJ*archive*data* )    show_archive ;;
+            *zip*archive*file* )    show_archive ;;
+            *                  )    # Tossing anything else to URLportal
+                                    UPBinary=$(which urlportal)
+                                    if [ -z "$UPBinary" ];then
+                                        UPBinary=$(which urlportal.sh)
+                                    fi
+                                    
+                                    if [ -f "$UPBinary" ];then
+                                        if [ -f ${infile} ];then  #URLPortal is really more meant to handle URLs
+                                            infile=$(echo "file://${infile}")
                                         fi
-                                        
-                                        if [ -f "$UPBinary" ];then
-                                            
-                                            if [ -z $GUI ];then
-                                                CommandString=$(printf "%s %s" "${UPBinary}" "-c ${infile}")
-                                            else
-                                                CommandString=$(printf "%s %s" "${UPBinary}" "-g ${infile}")
-                                            fi
-                                            nohup ${CommandString} > /dev/null
+                                        if [ -z $GUI ];then
+                                            CommandString=$(printf "%s %s" "${UPBinary}" "-c ${infile}")
+                                        else
+                                            CommandString=$(printf "%s %s" "${UPBinary}" "-g ${infile}")
                                         fi
-                                        ;;
-                esac 
-            ;;
-        esac
-    fi	
+                                        nohup ${CommandString} > /dev/null
+                                    fi
+                                    ;;
+            esac 
+        ;;
+    esac
+fi	

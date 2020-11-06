@@ -70,7 +70,7 @@ working out of the box.
 The following can be installed on Debian Buster or Bullseye (and probably Ubuntu) 
 by typing 
 
-`sudo apt update;sudo apt-get install fzf awk sed file mysql sqlite3 pandoc lynx wv unrtf pdftotext bat dtrx csvtool`
+`sudo apt update;sudo apt-get install fzf awk sed file mysql sqlite3 pandoc lynx wv unrtf pdftotext bat dtrx csvtool gnumeric w3m`
 
 * fzf  
 * awk  
