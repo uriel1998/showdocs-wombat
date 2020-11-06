@@ -70,7 +70,7 @@ working out of the box.
 The following can be installed on Debian Buster or Bullseye (and probably Ubuntu) 
 by typing 
 
-`sudo apt update;sudo apt-get install fzf awk sed file mysql sqlite3 pandoc lynx wv unrtf pdftotext bat dtrx csvtool`
+`sudo apt update;sudo apt-get install fzf awk sed file mysql sqlite3 pandoc lynx wv unrtf pdftotext bat dtrx csvtool gnumeric w3m libfile-mimeinfo-perl`
 
 * fzf  
 * awk  
@@ -88,6 +88,7 @@ by typing
 * csvtool
 * gnumeric
 * w3m
+* mimetype (in libfile-mimeinfo-perl)
 
 ### Install via Apt, but check the version.
 
@@ -161,6 +162,24 @@ the -g switch, making the command something like this:
 
 Not only will it launch a new xterm, but if you have `wmctrl` and `xseticon` set, 
 it will decorate the window with the script's icon and name.
+
+### Drop-in with URLPortal
+
+If you would like to streamline and consolidate your mailcap style experience, 
+you can use `showdocs` in place of your regular mailcap file. 
+
+If offered an URL, `showdocs` will follow any redirection (if [muna](https://uriel1998.github.io/muna/) 
+is installed and in your $PATH). If there's a filename with extension already there, 
+it will grab it and process the file locally (using URLPortal if needed).  If there is *not* a 
+file extension specified on the URL, it will download the file, then use `mimeinfo` to 
+try to figure out what it is, rename it appropriately, and process it locally (using 
+URLPortal if needed).
+
+This means that you can pass filenames *or* URLs straight to showdocs and use the 
+same flow.  
+
+I'm sure I've missed some major mimetypes that are odd (like how "vnd.ms-asf" is a 
+mimetype for WMV files), please let me know what I've missed!
 
 ### Colorizing Output
 
