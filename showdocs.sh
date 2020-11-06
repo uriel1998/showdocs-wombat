@@ -299,34 +299,52 @@ if [[ "$FunkyPath" =~ "https://" ]] || [[ "$FunkyPath" =~ "http://" ]];then
         source "$MunaBinary"
         url="${FunkyPath}"
         unredirector
-        FunkyPath=$(echo "${url}")
+        FunkyPath="${url}"
     fi
-    wget -q "${FunkyPath}" -O "$inettmp"
-    if [ -f "$inettmp" ];then
-        mt="$(mimetype -bM "$inettemp")"
-        ext="${mt##*/}"
-        ext="${ext##*/x-}"         # for mimetypes that have x- variations, like audio/midi and audio/x-midi
-        #type="${mt%%/*}"
-        case "$mt" in              # for mimetypes that are both audio and video
-            audio/mpeg*)
-                ext=$(echo "mp3")  #for clarification
-                ;;
-            video*)
-                ;;
-        esac
-        case "$ext" in
-            vnd.ms-asf) ext="wvm";;
-            msvideo) ext="avi";;
-            matroska) ext="mp4";;
-            quicktime) ext="mov" ;;
-        esac
-        echo mv -v "$inettemp" "$inettemp.$ext"
-        FunkyPath="${inettmp.$ext}"  # bringing us back in line with the rest of the flow
+    DINFO=$(wget --spider "$FunkyPath" 2>&1)
+    mimetype=$(echo "$DINFO"|egrep -e '^Length:'|awk -F "[" '{print $2}'|awk -F "]" '{print $1}')
+    mainmimetype=$(echo "$mimetype"|awk -F "/" '{print $1}')
+    fileurl=$(echo "$DINFO"|egrep -e '^--'|awk -F " " '{print $3}')
+    file=$(basename $fileurl)
+    #######
+    # If the URL already has a filename with extension, then use that.
+    #######
+    if [[ "$file" =~ "." ]];then  #does it have an extension already?
+        ext=${file##*.}
+        FunkyPath=$(echo "$inettmp.$ext")  # bringing us back in line with the rest of the flow
+        wget -q "${fileurl}" -O "$FunkyPath"
     else
-        exit 2
+        #######
+        # URL without extension, so we'll have to download it and find the mimetype
+        #######
+        ext=""
+        wget -q "${FunkyPath}" -O "$inettmp"
+        if [ -f "$inettmp" ];then
+            mt="$(mimetype -bM "$inettmp")"
+            ext="${mt##*/}"            # Most things have a minor mimetype that is similar ENOUGH to the extension to "just work"
+            ext="${ext##*/x-}"         # for mimetypes that have x- variations, like audio/midi and audio/x-midi
+            case "$mt" in              # for mimetypes that are both audio and video, like mpeg
+                audio/mpeg*)
+                    ext=$(echo "mp3")  
+                    ;;
+                video*)                 # left here for when I get these sorted
+                    ;;
+            esac
+            case "$ext" in
+                vnd.ms-asf) ext="wmv";;
+                msvideo) ext="avi";;
+                matroska) ext="mp4";;
+                quicktime) ext="mov" ;;
+            esac
+            mv -v "$inettmp" "$inettmp.$ext"
+            FunkyPath=$(echo "$inettmp.$ext")  # bringing us back in line with the rest of the flow
+        
+        else
+            exit 2
+        fi
     fi
 fi
-    
+
 cmdstring=$(printf "realpath \"%s\"" "$FunkyPath")
 infile=$(eval "$cmdstring")
 indir=$(dirname "$infile")
@@ -400,4 +418,4 @@ if [ -f "$infile" ]; then
             esac 
         ;;
     esac
-fi	
+fi
