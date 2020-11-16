@@ -1,4 +1,7 @@
-* [2020-11-05 20:09:31 CDT] - properly from urlview HEAD -> master, tag: v1.1.0, gitlab/master, github/master, github/HEAD, fc/master
+* [2020-11-16 15:55:10 CDT] - ANSI/ASCII art viewing HEAD -> master, tag: v1.2.0, gitlab/master, github/master, github/HEAD, fc/master
+* [2020-11-05 20:15:54 CDT] - github pages
+* [2020-11-05 20:12:07 CDT] - changelog
+* [2020-11-05 20:09:31 CDT] - properly from urlview tag: v1.1.0
 * [2020-11-05 19:30:08 CDT] - showdocs with remote files (and calling URLPortal)
 * [2020-11-04 18:55:00 CDT] - tag: v1.0.0
 * [2020-11-04 18:54:07 CDT] - youtube demo in docs
