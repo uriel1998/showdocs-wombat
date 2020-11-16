@@ -70,7 +70,7 @@ working out of the box.
 The following can be installed on Debian Buster or Bullseye (and probably Ubuntu) 
 by typing 
 
-`sudo apt update;sudo apt-get install fzf awk sed file mysql sqlite3 pandoc lynx wv unrtf pdftotext bat dtrx csvtool gnumeric w3m libfile-mimeinfo-perl ansilove node-iconv`
+`sudo apt update;sudo apt-get install fzf awk sed file mysql sqlite3 pandoc lynx wv unrtf pdftotext bat dtrx csvtool gnumeric w3m libfile-mimeinfo-perl ansilove chafa node-iconv`
 
 * fzf  
 * awk  
@@ -89,6 +89,7 @@ by typing
 * gnumeric
 * w3m
 * ansilove
+* chafa
 * node-iconv
 * mimetype (in libfile-mimeinfo-perl)
 

@@ -196,6 +196,17 @@ show_ansiart (){
     fi
 }
 
+show_xbart (){
+    tmpfile3=$(mktemp /tmp/showdocs-wombat.XXXXXXXXXXXX.${extension})
+    ansilove -o ${tmpfile3} ${infile}
+    if [ "$GUI" == "1" ];then
+        feh ${tmpfile3} -x -B black -g --insecure --geometry=600x600+15+60
+    else
+        chafa ${tmpfile3}
+    fi    
+    rm ${tmpfile3}
+}
+
 
 function xterm_setup() {
     echo "${SCRIPT_DIR}"
@@ -370,7 +381,7 @@ if [ -f "$infile" ]; then
     # Match extension first, since DOC and XLS give the same mimetype
     case "$extension" in
         ans|asc|diz|ans) show_ansiart;;
-        xb) GUI=1;show_ansiart;;  # xb is supported by ansilove, but the iconv trick doesn't work
+        xb) show_xbart;;  # xb is supported by ansilove, but the iconv trick doesn't work
         tgz|bz2|gz|zip|arj|rar) show_archive ;;
         deb|rpm) show_archive ;;
         sqlite) show_sqlite ;;
