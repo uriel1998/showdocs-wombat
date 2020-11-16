@@ -185,6 +185,17 @@ show_text (){
     bat --paging=always "$infile" 
 }
 
+show_ansiart (){
+    if [ "$GUI" == "1" ];then
+        tmpfile3=$(mktemp /tmp/showdocs-wombat.XXXXXXXXXXXX.${extension})
+        ansilove -o ${tmpfile3} ${infile}
+        feh ${tmpfile3} -x -B black -g --insecure --geometry=600x600+15+60
+        rm ${tmpfile3}
+    else
+        iconv -f 437 "$infile" | pv --quiet --rate-limit 7000
+    fi
+}
+
 
 function xterm_setup() {
     echo "${SCRIPT_DIR}"
@@ -358,6 +369,8 @@ if [ -f "$infile" ]; then
     
     # Match extension first, since DOC and XLS give the same mimetype
     case "$extension" in
+        ans|asc|diz|ans) show_ansiart;;
+        xb) GUI=1;show_ansiart;;  # xb is supported by ansilove, but the iconv trick doesn't work
         tgz|bz2|gz|zip|arj|rar) show_archive ;;
         deb|rpm) show_archive ;;
         sqlite) show_sqlite ;;
@@ -379,6 +392,7 @@ if [ -f "$infile" ]; then
         *)
             # Try to match by mimetype instead
             case "$mimetype" in     
+            *text*with*escape*sequences) show_ansiart ;;
             *Python*script* )          show_text ;;
             *PHP*script* )          show_text ;;
             *Perl*script* )         show_text ;;

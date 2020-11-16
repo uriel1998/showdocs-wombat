@@ -34,8 +34,8 @@ Inspiration taken from `mutt.octet.filter` for how to best match mimetypes.
 Why should you use this instead of another mailcap type solution?
 
 1. As written with the full helper list, it is set up to render Word (DOC & DOCX), 
-Excel (XLS and XLSX), Open/LibreOffice (ODS/ODT), RTF, PDF, markdown, JSON, and HTML 
-and will pretty much gladly take any text file (XML, etc) and colorize it.
+Excel (XLS and XLSX), Open/LibreOffice (ODS/ODT), RTF, PDF, markdown, JSON, ANSI/ASCII art, 
+HTML, and will pretty much gladly take any text file (XML, etc) and colorize it.
 
 2. If it runs across an undefined filetype, it can pass it on to any *other* mailcap 
 style program, and is set up to use my fork of gotbletu's [URLPortal](https://github.com/uriel1998/newsbeuter-dangerzone/blob/master/urlportal.sh) by default.
@@ -70,7 +70,7 @@ working out of the box.
 The following can be installed on Debian Buster or Bullseye (and probably Ubuntu) 
 by typing 
 
-`sudo apt update;sudo apt-get install fzf awk sed file mysql sqlite3 pandoc lynx wv unrtf pdftotext bat dtrx csvtool gnumeric w3m libfile-mimeinfo-perl`
+`sudo apt update;sudo apt-get install fzf awk sed file mysql sqlite3 pandoc lynx wv unrtf pdftotext bat dtrx csvtool gnumeric w3m libfile-mimeinfo-perl ansilove node-iconv`
 
 * fzf  
 * awk  
@@ -88,6 +88,8 @@ by typing
 * csvtool
 * gnumeric
 * w3m
+* ansilove
+* node-iconv
 * mimetype (in libfile-mimeinfo-perl)
 
 ### Install via Apt, but check the version.
