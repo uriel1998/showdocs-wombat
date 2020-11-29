@@ -90,7 +90,7 @@ by typing
 * w3m
 * ansilove
 * chafa
-* node-iconv
+* node-iconv (or another flavor of iconv)
 * mimetype (in libfile-mimeinfo-perl)
 
 ### Install via Apt, but check the version.

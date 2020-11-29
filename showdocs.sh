@@ -83,6 +83,8 @@ show_doc (){
         wvWare "$infile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | eval "$browsercommand"
     elif [[ "$mimetype" == *"$rtfstring"* ]];then
         unrtf --html "$infile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | eval "$browsercommand"
+    else
+        show_text
     fi
 }
 
@@ -189,10 +191,12 @@ show_ansiart (){
     if [ "$GUI" == "1" ];then
         tmpfile3=$(mktemp /tmp/showdocs-wombat.XXXXXXXXXXXX.${extension})
         ansilove -o ${tmpfile3} ${infile}
-        feh ${tmpfile3} -x -B black -g --insecure --geometry=600x600+15+60
+        feh ${tmpfile3} -x -B black -g --insecure --geometry=800x600+15+60
         rm ${tmpfile3}
     else
-        iconv -f 437 "$infile" | pv --quiet --rate-limit 7000
+        # If you care about simulating baud rates
+        #iconv -f 437 "$infile" | pv --quiet --rate-limit 7000
+        iconv -f 437 "$infile"
     fi
 }
 
@@ -380,7 +384,7 @@ if [ -f "$infile" ]; then
     
     # Match extension first, since DOC and XLS give the same mimetype
     case "$extension" in
-        ans|asc|diz|ans) show_ansiart;;
+        ans|asc|nfo|qqdiz|ans|mnu) show_ansiart;;
         xb) show_xbart;;  # xb is supported by ansilove, but the iconv trick doesn't work
         tgz|bz2|gz|zip|arj|rar) show_archive ;;
         deb|rpm) show_archive ;;
