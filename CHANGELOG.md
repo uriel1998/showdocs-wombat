@@ -1,4 +1,7 @@
-* [2020-11-16 15:55:10 CDT] - ANSI/ASCII art viewing HEAD -> master, tag: v1.2.0, gitlab/master, github/master, github/HEAD, fc/master
+* [2020-11-29 08:50:48 CDT] - check that DOC isn't text HEAD -> master, tag: v1.2.2, gitlab/master, github/master, github/HEAD, fc/master
+* [2020-11-16 16:33:15 CDT] - better handling of odd ansi art like xb tag: v1.2.1
+* [2020-11-16 15:57:16 CDT] - changelog
+* [2020-11-16 15:55:10 CDT] - ANSI/ASCII art viewing tag: v1.2.0
 * [2020-11-05 20:15:54 CDT] - github pages
 * [2020-11-05 20:12:07 CDT] - changelog
 * [2020-11-05 20:09:31 CDT] - properly from urlview tag: v1.1.0
