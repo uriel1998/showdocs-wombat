@@ -229,10 +229,22 @@ show_images (){
     # is GUI or not?    
     if [ "$GUI" == "1" ];then
             nohup $IMAGEGUI "${infile}" > /dev/null 2>&1 &
-    else 
-           nohup $IMAGECLI "${infile}" ; echo "Press any key." ; read
+    else
+        CommandLine=$(echo "${IMAGECLI} ${infile} ; read")
+        eval "${CommandLine}"
     fi    
 }
+
+show_images_gif (){
+    # is GUI or not?    
+    
+    if [ "$GUI" == "1" ];then
+            nohup $IMAGEGUI "${infile}" > /dev/null 2>&1 &
+    else 
+            $IMAGECLI "${infile}" ; echo "Press any key." ; read
+    fi    
+}
+
 
 
 function xterm_setup() {
@@ -404,7 +416,6 @@ if [ -f "$infile" ]; then
     #get extension, lowercase it
     extension=$(echo "${filename##*.}" | tr '[:upper:]' '[:lower:]')
     mimetype=$(file "$filename" | awk -F ':' '{ print $2 }') 
-    
     # Match extension first, since DOC and XLS give the same mimetype
     case "$extension" in
         ans|asc|nfo|qqdiz|ans|mnu) show_ansiart;;
@@ -428,6 +439,7 @@ if [ -f "$infile" ]; then
         pl) show_text ;;
         rc|txt|sh|conf|ini) show_text ;;
         png|jpg|jpeg) show_images ;;
+        gif) show_images_gif ;;
         *)
             # Try to match by mimetype instead
             case "$mimetype" in     
@@ -450,6 +462,9 @@ if [ -f "$infile" ]; then
             *gzip*             )    show_archive ;;
             *ARJ*archive*data* )    show_archive ;;
             *zip*archive*file* )    show_archive ;;
+            *PNG*image*data* )      show_images ;;
+            *JPEG*image*data* )     show_images ;;
+            *GIF*image*data* )      show_images_gif ;;
             *                  )    # Tossing anything else to URLportal
                                     UPBinary=$(which urlportal)
                                     if [ -z "$UPBinary" ];then
