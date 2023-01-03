@@ -46,6 +46,7 @@ export SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 CommandString=""
 GUI="" #This is used if needed for URLPORTAL
 TMUX="" #This is used if needed to determine what web browser to use
+
 ##############################################################################
 # Mimetype Strings
 ##############################################################################
@@ -62,6 +63,9 @@ xmlstring="XML 1.0 document"
 phpstring="PHP script"
 plstring="Perl script"
 sqlite="SQLite 3.x database"
+pngstring="PNG image data"
+jpegstring="JPEG image data"
+gifstring="GIF image data"
 
 ##############################################################################
 # Displaying functions
@@ -222,22 +226,12 @@ show_xbart (){
 
 
 show_images (){
-    
-    if [ "${CliOnly}" = "false" ];then 
+    # is GUI or not?    
+    if [ "$GUI" == "1" ];then
             nohup $IMAGEGUI "${infile}" > /dev/null 2>&1 &
     else 
-            tmux new-window -n pixcli && tmux send-keys "$IMAGECLI '$url' ; read && tmux kill-pane" 'Enter'
-        fi    
-    # is GUI or not?
-    # terminal-image or chafa?
-    tmpfile3=$(mktemp /tmp/showdocs-wombat.XXXXXXXXXXXX.${extension})
-    ansilove -o ${tmpfile3} ${infile}
-    if [ "$GUI" == "1" ];then
-        feh ${tmpfile3} -x -B black -g --insecure --geometry=600x600+15+60
-    else
-        chafa ${tmpfile3}
+           nohup $IMAGECLI "${infile}" ; echo "Press any key." ; read
     fi    
-    rm ${tmpfile3}
 }
 
 
@@ -433,6 +427,7 @@ if [ -f "$infile" ]; then
         xml) show_text ;;
         pl) show_text ;;
         rc|txt|sh|conf|ini) show_text ;;
+        png|jpg|jpeg) show_images ;;
         *)
             # Try to match by mimetype instead
             case "$mimetype" in     
