@@ -2,11 +2,10 @@
 
 ##############################################################################
 #  showdocs-wombat 
-#  (c) Steven Saus 2020
+#  (c) Steven Saus 2022
 #  Licensed under the MIT license
 #
 ##############################################################################
-
 
 # There are a lot of commandline converters... but few that do just about everything.
 # This aims to standardize a LOT of them.
@@ -32,6 +31,13 @@ MunaBinary=$(which muna.sh)
 # For unredirecting URLs
 
 TerminalBinary=$(which xterm)
+
+# adding in image support
+IMAGEGUI="feh -. -x -B black -g --insecure --keep-http --geometry=600x600+15+60"
+# IMAGECLI="w3m /usr/lib/w3m/cgi-bin/treat_as_url.cgi -o display_image=1 -o imgdisplay=/usr/lib/w3m/w3mimgdisplay"
+# IMAGECLI="chafa --colors=256 --dither=diffusion"
+IMAGECLI="/usr/local/bin/image"
+
 
 #get installation directory
 export SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -97,7 +103,10 @@ show_rtf (){
 }
 
 show_pdf (){
-    
+
+# TODO - check if no text, if not, use convert and terminal-image or chafa to 
+# display the first page or two.
+
     pdftotext -nopgbrk -layout -nodiag "$infile" "$tmpfile"
 
     # If it is not in its own xterm, why do any of this?
@@ -201,6 +210,26 @@ show_ansiart (){
 }
 
 show_xbart (){
+    tmpfile3=$(mktemp /tmp/showdocs-wombat.XXXXXXXXXXXX.${extension})
+    ansilove -o ${tmpfile3} ${infile}
+    if [ "$GUI" == "1" ];then
+        feh ${tmpfile3} -x -B black -g --insecure --geometry=600x600+15+60
+    else
+        chafa ${tmpfile3}
+    fi    
+    rm ${tmpfile3}
+}
+
+
+show_images (){
+    
+    if [ "${CliOnly}" = "false" ];then 
+            nohup $IMAGEGUI "${infile}" > /dev/null 2>&1 &
+    else 
+            tmux new-window -n pixcli && tmux send-keys "$IMAGECLI '$url' ; read && tmux kill-pane" 'Enter'
+        fi    
+    # is GUI or not?
+    # terminal-image or chafa?
     tmpfile3=$(mktemp /tmp/showdocs-wombat.XXXXXXXXXXXX.${extension})
     ansilove -o ${tmpfile3} ${infile}
     if [ "$GUI" == "1" ];then
@@ -431,6 +460,10 @@ if [ -f "$infile" ]; then
                                     if [ -z "$UPBinary" ];then
                                         UPBinary=$(which urlportal.sh)
                                     fi
+                                    if [ -z "$UPBinary" ];then
+                                        # can't find urlportal.sh on the $PATH, trying xdg-open
+                                        UPBinary=$(which xdg-open)
+                                    fi                                    
                                     
                                     if [ -f "$UPBinary" ];then
                                         if [ -f ${infile} ];then  #URLPortal is really more meant to handle URLs

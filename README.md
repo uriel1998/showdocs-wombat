@@ -99,23 +99,31 @@ by typing
 
 ### Via pip
 
-These can be installed (if you have python and pip installed, naturally) by typing:
+These can be installed (if you have [python and pip](https://duckduckgo.com/?t=ffab&q=how+to+install+python+and+pip&ia=web) installed, naturally) by typing:
 
-`sudo pip3 install -r requirements.txt` 
+`pip3 install -r requirements.txt` 
 
-`sudo pip3 install git+https://github.com/wustho/epy`
+`pip3 install git+https://github.com/wustho/epy`
 
 * csvkit (provides in2csv )
 * xlsx2csv
 * [tabview](https://github.com/TabViewer/gtabview)  
 * [epy](https://github.com/wustho/epy)  
 
+### Via npm
+
+This is *really* optional, but very nice.
+
+[terminal-image-cli](https://github.com/sindresorhus/terminal-image-cli) can be installed to use instead of chafa (if you have [node and npm installed](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm), naturally) by typing:
+
+`npm install --global terminal-image-cli`
+
 These are *really* optional, but are nice:
 
 * wmctrl - `sudo apt install wmctrl`  
 * [xseticon](https://sourceforge.net/projects/xseticon/)  
 * [devour - from TDAB](https://uriel1998.github.io/tdab/)  
-* [URLPortal - from newsbeuter-dangerzone](https://github.com/uriel1998/newsbeuter-dangerzone/blob/master/urlportal.sh)
+* [URLPortal - from newsbeuter-dangerzone](https://github.com/uriel1998/newsbeuter-dangerzone/blob/master/urlportal.sh) - note, this is now included in this repository as well.
 
 ## 4. Installation
 
