@@ -18,6 +18,12 @@
 # HTML
 # CSV
 
+# TODO - previewer mode for fzf/lf
+# TODO - PDF image preview
+# TODO - other image format preview via convert
+# TODO - flatpak install?
+# TODO - put all the converter strings in one place
+
 tmpfile=$(mktemp)
 inettmp=$(mktemp /tmp/showdocs-wombatXXXXXXXXXXXXXXXXXXX)
 
