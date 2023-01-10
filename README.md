@@ -112,7 +112,7 @@ These can be installed (if you have [python and pip](https://duckduckgo.com/?t=f
 
 ### Via npm
 
-This is *really* optional, but very nice.
+This is *really* optional as an alternative to using `chafa`. 
 
 [terminal-image-cli](https://github.com/sindresorhus/terminal-image-cli) can be installed to use instead of chafa (if you have [node and npm installed](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm), naturally) by typing:
 

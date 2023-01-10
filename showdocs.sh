@@ -35,8 +35,8 @@ TerminalBinary=$(which xterm)
 # adding in image support
 IMAGEGUI="feh -. -x -B black -g --insecure --keep-http --geometry=600x600+15+60"
 # IMAGECLI="w3m /usr/lib/w3m/cgi-bin/treat_as_url.cgi -o display_image=1 -o imgdisplay=/usr/lib/w3m/w3mimgdisplay"
-# IMAGECLI="chafa --colors=256 --dither=diffusion"
-IMAGECLI="/usr/local/bin/image"
+IMAGECLI="chafa --colors=256 --dither=diffusion"
+#IMAGECLI="/usr/local/bin/image"
 
 
 #get installation directory
@@ -228,7 +228,7 @@ show_xbart (){
 show_images (){
     # is GUI or not?    
     if [ "$GUI" == "1" ];then
-            nohup $IMAGEGUI "${infile}" > /dev/null 2>&1 &
+        nohup $IMAGEGUI "${infile}" > /dev/null 2>&1 &
     else
         CommandLine=$(echo "${IMAGECLI} ${infile} ; read")
         eval "${CommandLine}"
@@ -236,16 +236,19 @@ show_images (){
 }
 
 show_images_gif (){
-    # is GUI or not?    
-    
+    # is GUI or not? 
+    # best to use ffmpeg to extract a frame until t   
+     #ffmpeg -i ./bravo_test.gif -r 1/1 -frames 1 ${tmpfile3}
     if [ "$GUI" == "1" ];then
-            nohup $IMAGEGUI "${infile}" > /dev/null 2>&1 &
-    else 
-            $IMAGECLI "${infile}" ; echo "Press any key." ; read
+        nohup $IMAGEGUI "${infile}" > /dev/null 2>&1 &
+    else
+        tmpfile3=$(mktemp /tmp/showdocs-wombat.XXXXXXXXXXXX.jpg)
+        $(which ffmpeg) -i "${infile}" -r 1/1 -frames 1 ${tmpfile3}
+        CommandLine=$(echo "${IMAGECLI} ${tmpfile3} ; read")
+        eval "${CommandLine}"
+        rm "${tmpfile3}"
     fi    
 }
-
-
 
 function xterm_setup() {
     echo "${SCRIPT_DIR}"
