@@ -50,6 +50,9 @@ if [ ! -d "${XDG_CONFIG_HOME}" ];then
     exit 99
 fi
 
+###############################################################################
+# Binary findings and configuration
+###############################################################################
 
 tmpfile=$(mktemp)
 inettmp=$(mktemp /tmp/showdocs-wombatXXXXXXXXXXXXXXXXXXX)
@@ -60,9 +63,10 @@ if [ -z "$DevourBinary" ];then
     DevourBinary=$(which devour.sh)
 fi
 
-MunaBinary=$(which muna.sh)
 # For unredirecting URLs
+MunaBinary=$(which muna.sh)
 
+# For unredirecting URLs
 TerminalBinary=$(which xterm)
 
 # adding in image support
@@ -70,7 +74,6 @@ IMAGEGUI="feh -. -x -B black -g --insecure --keep-http --geometry=600x600+15+60"
 # IMAGECLI="w3m /usr/lib/w3m/cgi-bin/treat_as_url.cgi -o display_image=1 -o imgdisplay=/usr/lib/w3m/w3mimgdisplay"
 IMAGECLI="chafa --colors=256 --dither=diffusion"
 #IMAGECLI="/usr/local/bin/image"
-
 
 #get installation directory
 export SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -382,7 +385,8 @@ else
     ## PREVIEWER MODE #########################################################
     # (No devour script detection, no tmux detection, no GUI detection)
     ###########################################################################
-
+    shift
+    # eat up that cli variable
 fi
 
 
