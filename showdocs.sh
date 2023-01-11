@@ -24,6 +24,33 @@
 # TODO - flatpak install?
 # TODO - put all the converter strings in one place
 
+
+LOUD=0
+
+function loud() {
+    if [ $LOUD -eq 1 ];then
+        echo "$@"
+    fi
+}
+
+# I want to check if it's using the $HOME or flatpak ones here,
+#echo "$XDG_CONFIG_HOME"
+#echo "$XDG_DATA_HOME"
+#echo "$XDG_CACHE_HOME"
+
+
+if [ -z "${XDG_DATA_HOME}" ];then
+    export XDG_DATA_HOME="${HOME}/.local/share"
+    export XDG_CONFIG_HOME="${HOME}/.config"
+    export XDG_CACHE_HOME="${HOME}/.cache"
+fi
+
+if [ ! -d "${XDG_CONFIG_HOME}" ];then
+    echo "Your XDG_CONFIG_HOME variable is not properly set and does not exist."
+    exit 99
+fi
+
+
 tmpfile=$(mktemp)
 inettmp=$(mktemp /tmp/showdocs-wombatXXXXXXXXXXXXXXXXXXX)
 
@@ -275,11 +302,11 @@ function xterm_setup() {
 function show_help() {
     echo "Usage: showdoc.sh $filename"
     echo "  -h = show this help"
-    echo "  -g = implies called from a GUI, will launch own terminal"
-    echo "  Will also use devour script if available."
+    echo "  -g = implies called from a GUI, will launch own terminal and decorate it."
+    echo "  -p = previewer mode for fzf, lf, etc; implies *not* using devour script. "    
+    echo "  Will otherwise use devour script if in tmux and it is available."
     echo "  To view mysql, showdoc.sh mysql [USERNAME] [PASSWORD}"   
 }
-
 
 ##############################################################################
 # Show mysql
@@ -311,41 +338,55 @@ if [ "$1" == "-h" ];then
     exit
 fi    
 
-# If it's going to be a spawned terminal, we want to start setting it up now.
-# calling the process again in an xterm
-if [ "$1" == "-g" ];then
-    shift
-    FunkyPath=$(echo "$@" | sed 's/#/\\#/g')
-    xterm -e "$SCRIPT_DIR/showdocs.sh -+- $SCRIPT_DIR $FunkyPath" &
-    exit
-fi
+if [ "$1" != "-p" ];then
+    ## NOT! PREVIEWER MODE ###################################################
+    
 
 
-# We've been called in an xterm
-if [ "$1" == "-+-" ];then
-    GUI=1  # storing in case we need to pass it to URLportal
-    shift
-    SCRIPT_DIR="$1"
-    shift
-    xterm_setup
-fi
-
-browsercommand=$(echo "lynx -stdin -lss=$HOME/.lynx/lynx.lss")
-
-if [ -z "$GUI" ];then
-    # The other variables should have already been used up 
-    if [ "$1" == "+-+" ];then #already in tmux, already re-called, and devour exists
-        browsercommand=$(echo "w3m -T text/html")
+    # If it's going to be a spawned terminal, we want to start setting it up now.
+    # calling the process again in an xterm
+    if [ "$1" == "-g" ];then
         shift
-    else
-        c_tmux=$(env | grep -c TMUX)  # Are we in tmux?
-        if [ $c_tmux -gt 0 ] && [ ! -z "$DevourBinary" ];then #does devour exist?
-            FunkyPath=$(echo "$@" | sed 's/#/\\#/g')
-            "$DevourBinary" "$SCRIPT_DIR/showdocs.sh +-+ $FunkyPath"  # re-call it in devour
-            exit
+        FunkyPath=$(echo "$@" | sed 's/#/\\#/g')
+        xterm -e "$SCRIPT_DIR/showdocs.sh -+- $SCRIPT_DIR $FunkyPath" &
+        exit
+    fi
+
+
+    # We've been called in an xterm
+    if [ "$1" == "-+-" ];then
+        GUI=1  # storing in case we need to pass it to URLportal
+        shift
+        SCRIPT_DIR="$1"
+        shift
+        xterm_setup
+    fi
+
+    browsercommand=$(echo "lynx -stdin -lss=$HOME/.lynx/lynx.lss")
+
+    if [ -z "$GUI" ];then
+        # The other variables should have already been used up 
+        if [ "$1" == "+-+" ];then #already in tmux, already re-called, and devour exists
+            browsercommand=$(echo "w3m -T text/html")
+            shift
+        else
+            c_tmux=$(env | grep -c TMUX)  # Are we in tmux?
+            if [ $c_tmux -gt 0 ] && [ ! -z "$DevourBinary" ];then #does devour exist?
+                FunkyPath=$(echo "$@" | sed 's/#/\\#/g')
+                "$DevourBinary" "$SCRIPT_DIR/showdocs.sh +-+ $FunkyPath"  # re-call it in devour
+                exit
+            fi
         fi
     fi
+else
+    ## PREVIEWER MODE #########################################################
+    # (No devour script detection, no tmux detection, no GUI detection)
+    ###########################################################################
+
 fi
+
+
+
 
 if [ "$1" == "mysql" ];then
     MYSQLU="$2"
