@@ -18,8 +18,7 @@
 # HTML
 # CSV
 
-# TODO - previewer mode for fzf/lf
-# TODO - PDF image preview
+# TODO - standardize binaries, or how to search for them, check for them, etc.
 # TODO - other image format preview via convert
 # TODO - flatpak install?
 # TODO - put all the converter strings in one place
@@ -54,8 +53,10 @@ fi
 # Binary findings and configuration
 ###############################################################################
 
-tmpfile=$(mktemp)
-inettmp=$(mktemp /tmp/showdocs-wombatXXXXXXXXXXXXXXXXXXX)
+tmpdir=$(mktemp -d)
+tmpfile=$(mktemp ${tmpdir}/showdocs-wombatXXXXXXXXXXXXXXXXXXX)
+inettmp=$(mktemp ${tmpdir}/tmp/showdocs-wombatXXXXXXXXXXXXXXXXXXX)
+
 
 # Referring to my devour script
 DevourBinary=$(which devour)
@@ -149,32 +150,37 @@ show_pdf (){
 
     
 
-    bob=$(pdftotext ./NoTextInPDFtest.pdf)
+    bob=$(pdftotext "${infile}")
     if [ -z $bob ];
-        pdfimages -j -f 1 -l 1 ./NoTextInPDFtest.pdf ./out 
-        if [ ! -f ./out-000.jpg ];then
-            convert  source.pdf[0]  output.jpeg
-            if [ ! -f ./output.jpeg ;then
+        pdfimages -j -f 1 -l 1 "${infile}" "${tmpdir}"/out 
+        if [ ! -f "${tmpdir}"/out-000.jpg ];then
+            convert  "${infile}"[0]  "${tmpdir}"/out-000.jpg
+            if [ ! -f "${tmpdir}"/out-000.jpg ;then
                 echo "No data in PDF"
+            else
+                infile="${tmpdir}"/out-000.jpg
+                show_images
+                rm "${tmpdir}"/out-000.jpg
             fi
         fi
+        
     else
         pdftotext -nopgbrk -layout -nodiag "$infile" "$tmpfile"
-    fi
-
-    # If it is not in its own xterm, why do any of this?
-    if [ "$GUI" == "1" ];then
-        MaxWidth=$(wc -L "$tmpfile" | awk '{print $1}')
-        if [ "$MaxWidth" -gt "$COLUMNS" ];then
-            if [ $(which wmctrl) ];then
-                CommandString=$(printf "%s %s" "${CommandString}" 'snark=$(echo $WINDOWID);')
-                CommandString=$(printf "%s %s %s" "${CommandString}" 'wmctrl -i -r $snark -e '0,-1,-1,1200,-1';')
-                eval ${CommandString}
+        # If it is not in its own xterm, why do any of this?
+        if [ "$GUI" == "1" ];then
+            MaxWidth=$(wc -L "$tmpfile" | awk '{print $1}')
+            if [ "$MaxWidth" -gt "$COLUMNS" ];then
+                if [ $(which wmctrl) ];then
+                    CommandString=$(printf "%s %s" "${CommandString}" 'snark=$(echo $WINDOWID);')
+                    CommandString=$(printf "%s %s %s" "${CommandString}" 'wmctrl -i -r $snark -e '0,-1,-1,1200,-1';')
+                    eval ${CommandString}
+                fi
             fi
         fi
+
+        bat --decorations never "$tmpfile"; rm "$tmpfile"
     fi
 
-    bat --decorations never "$tmpfile"; rm "$tmpfile"
 
 #TODO- use this to look for spaces (and therefore columns) in pdf output
 # grep -o ' ' | wc -l 
@@ -555,3 +561,7 @@ if [ -f "$infile" ]; then
         ;;
     esac
 fi
+
+rm -rf ${tmpfile}
+rm -rf ${inettmp}
+rm -rf ${tmpdir}
