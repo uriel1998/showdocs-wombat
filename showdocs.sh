@@ -147,7 +147,20 @@ show_pdf (){
 # TODO - check if no text, if not, use convert and terminal-image or chafa to 
 # display the first page or two.
 
-    pdftotext -nopgbrk -layout -nodiag "$infile" "$tmpfile"
+    
+
+    bob=$(pdftotext ./NoTextInPDFtest.pdf)
+    if [ -z $bob ];
+        pdfimages -j -f 1 -l 1 ./NoTextInPDFtest.pdf ./out 
+        if [ ! -f ./out-000.jpg ];then
+            convert  source.pdf[0]  output.jpeg
+            if [ ! -f ./output.jpeg ;then
+                echo "No data in PDF"
+            fi
+        fi
+    else
+        pdftotext -nopgbrk -layout -nodiag "$infile" "$tmpfile"
+    fi
 
     # If it is not in its own xterm, why do any of this?
     if [ "$GUI" == "1" ];then
@@ -388,8 +401,6 @@ else
     shift
     # eat up that cli variable
 fi
-
-
 
 
 if [ "$1" == "mysql" ];then
