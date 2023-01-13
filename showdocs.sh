@@ -144,10 +144,13 @@ show_rtf (){
 }
 
 show_pdf (){
-    bob=""
-    bob=$(pdftotext "${infile}")
-    # if there is no text in the PDF
-    if [ -z $bob ];then
+    
+    pdftotext -nopgbrk -layout -nodiag "$infile" "$tmpfile"    
+    # Testing the file size
+    minimumsize=512
+    actualsize=$(wc -c <"$tmpfile")
+    if [ $actualsize -le $minimumsize ]; then
+        # if there is (effectively) no text in the PDF
         # try to extract images in a few different ways.
         pdfimages -j -f 1 -l 1 "${infile}" "${tmpdir}"/out 
         if [ ! -f "${tmpdir}"/out-000.jpg ];then
@@ -163,7 +166,7 @@ show_pdf (){
             loud "No data in PDF"
         fi
     else
-        pdftotext -nopgbrk -layout -nodiag "$infile" "$tmpfile"
+        # there's enough text data it's probably got a text layer
         # If it is not in its own xterm, why do any of this?
         if [ "$GUI" == "1" ];then
             MaxWidth=$(wc -L "$tmpfile" | awk '{print $1}')
