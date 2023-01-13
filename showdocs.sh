@@ -144,12 +144,7 @@ show_rtf (){
 }
 
 show_pdf (){
-
-# TODO - check if no text, if not, use convert and terminal-image or chafa to 
-# display the first page or two.
-
-    
-
+    bob=""
     bob=$(pdftotext "${infile}")
     # if there is no text in the PDF
     if [ -z $bob ];then
@@ -159,12 +154,13 @@ show_pdf (){
             convert  "${infile}"[0]  "${tmpdir}"/out-000.jpg
         fi
         
-        if [ -f "${tmpdir}"/out-000.jpg ] ;then
+        if [ -f "${tmpdir}"/out-000.jpg ] ;then           
             infile="${tmpdir}"/out-000.jpg
+            loud "No text data, showing image preview of first page."
             show_images
             rm "${tmpdir}"/out-000.jpg
         else
-            echo "No data in PDF"
+            loud "No data in PDF"
         fi
     else
         pdftotext -nopgbrk -layout -nodiag "$infile" "$tmpfile"
@@ -181,12 +177,6 @@ show_pdf (){
         fi
         bat --decorations never "$tmpfile"; rm "$tmpfile"
     fi
-
-
-#TODO- use this to look for spaces (and therefore columns) in pdf output
-# grep -o ' ' | wc -l 
-# but need to find matches PER line, it's teh wrong grep output for that.
-    
 }
 
 show_ods (){
@@ -208,12 +198,10 @@ show_ods (){
 }
 
 show_json () {
-
     echo "[$(cat "$infile")]" | in2csv -I -f json | csvtool transpose - | tabview -
 }
 
 show_excel (){
-
     tmpfile2=""
     if [ $(which in2csv) ];then
         in2csv "$infile" | tabview -    
@@ -291,6 +279,12 @@ show_images (){
     fi    
 }
 
+
+show_video_preview (){
+        thumbnail="$LF_UEBERZUG_TEMPDIR/thumbnail.png"
+    ffmpeg -y -i "$file" -vframes 1 "$thumbnail"
+}
+
 show_images_gif (){
     # is GUI or not? 
     if [ "$GUI" == "1" ];then
@@ -364,20 +358,17 @@ fi
 if [ "$1" != "-p" ];then
     ## NOT! PREVIEWER MODE ###################################################
     
-
-
-    # If it's going to be a spawned terminal, we want to start setting it up now.
-    # calling the process again in an xterm
     if [ "$1" == "-g" ];then
+        # If it's going to be a spawned terminal, we want to start setting it up now.
+        # calling the process again in an xterm
         shift
         FunkyPath=$(echo "$@" | sed 's/#/\\#/g')
         xterm -e "$SCRIPT_DIR/showdocs.sh -+- $SCRIPT_DIR $FunkyPath" &
         exit
     fi
 
-
-    # We've been called in an xterm
     if [ "$1" == "-+-" ];then
+        # We've been called in an xterm
         GUI=1  # storing in case we need to pass it to URLportal
         shift
         SCRIPT_DIR="$1"
@@ -421,11 +412,12 @@ if [ "$1" == "mysql" ];then
     fi
 fi
 
-
 # This is necessary so that if a filename is unescaped, it'll get fixed.
 FunkyPath=$(echo "$@")
 
+################################################################################
 #If it is a URL, download it, identify it, and then run through showdocs/URLPortal
+################################################################################
 if [[ "$FunkyPath" =~ "https://" ]] || [[ "$FunkyPath" =~ "http://" ]];then
     if [ ! -z "$MunaBinary" ];then
         source "$MunaBinary"
@@ -480,7 +472,6 @@ fi
 cmdstring=$(printf "realpath \"%s\"" "$FunkyPath")
 infile=$(eval "$cmdstring")
 indir=$(dirname "$infile")
-
     
 if [ -f "$infile" ]; then
     filename=$(basename "$infile")

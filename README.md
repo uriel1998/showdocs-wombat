@@ -211,3 +211,52 @@ solution instead.
 * View the files in the archive, not just the list of the files IN the archive
 * Further set up database viewing for postgres
 * installation example for midnight commander
+
+dtrx
+sqlite3
+pandoc
+wvWare
+sed
+pspg
+bat
+unrtf
+pandoc
+pdfimages
+convert
+pdftotext
+ssconvert
+soffice
+tabview
+in2csv
+csvtool
+xlsx2csv
+gnumeric
+epy
+cat
+ansilove
+feh
+iconv
+chafa
+ffmpeg
+fzf
+xseticon
+wmctrl
+
+
+
+
+In Midnight Commander go to Options menu / Configuration... command / Use internal edit checkbox and uncheck it. (Don't forget to execute the Save setup command if the Auto save setup option is off.)
+
+Then set the EDITOR environment variable to Sublime. You may prefer to add one of these to your shell's resource file:
+
+    Global setting for all programs that use EDITOR (not recommended):
+
+    EDITOR=sublime
+    export EDITOR
+
+    Temporary setting for the given Midnight Commander session only:
+
+    alias mc='EDITOR=sublime mc'
+
+Same for the viewer, just you uncheck the Use internal view option and set the VIEWER environment variable instead.
+
