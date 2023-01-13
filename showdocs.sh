@@ -22,7 +22,7 @@
 # TODO - other image format preview via convert
 # TODO - flatpak install?
 # TODO - put all the converter strings in one place
-
+# TODO - viewer and previewer mode configs for mc, lf, others?
 
 LOUD=0
 
@@ -55,7 +55,7 @@ fi
 
 tmpdir=$(mktemp -d)
 tmpfile=$(mktemp ${tmpdir}/showdocs-wombatXXXXXXXXXXXXXXXXXXX)
-inettmp=$(mktemp ${tmpdir}/tmp/showdocs-wombatXXXXXXXXXXXXXXXXXXX)
+inettmp=$(mktemp ${tmpdir}/showdocs-iwombatXXXXXXXXXXXXXXXXXXX)
 
 
 # Referring to my devour script
@@ -151,19 +151,21 @@ show_pdf (){
     
 
     bob=$(pdftotext "${infile}")
-    if [ -z $bob ];
+    # if there is no text in the PDF
+    if [ -z $bob ];then
+        # try to extract images in a few different ways.
         pdfimages -j -f 1 -l 1 "${infile}" "${tmpdir}"/out 
         if [ ! -f "${tmpdir}"/out-000.jpg ];then
             convert  "${infile}"[0]  "${tmpdir}"/out-000.jpg
-            if [ ! -f "${tmpdir}"/out-000.jpg ;then
-                echo "No data in PDF"
-            else
-                infile="${tmpdir}"/out-000.jpg
-                show_images
-                rm "${tmpdir}"/out-000.jpg
-            fi
         fi
         
+        if [ -f "${tmpdir}"/out-000.jpg ] ;then
+            infile="${tmpdir}"/out-000.jpg
+            show_images
+            rm "${tmpdir}"/out-000.jpg
+        else
+            echo "No data in PDF"
+        fi
     else
         pdftotext -nopgbrk -layout -nodiag "$infile" "$tmpfile"
         # If it is not in its own xterm, why do any of this?
@@ -177,7 +179,6 @@ show_pdf (){
                 fi
             fi
         fi
-
         bat --decorations never "$tmpfile"; rm "$tmpfile"
     fi
 
