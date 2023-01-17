@@ -109,6 +109,8 @@ These can be installed (if you have [python and pip](https://duckduckgo.com/?t=f
 * xlsx2csv
 * [tabview](https://github.com/TabViewer/gtabview)  
 * [epy](https://github.com/wustho/epy)  
+* [gif-for-cli](http://www.commandlinefu.com/commands/view/26731/quickly-run-any-gif-as-a-ascii-animation-in-a-terminal-window)
+
 
 ### Via npm
 
@@ -241,7 +243,7 @@ ffmpeg
 fzf
 xseticon
 wmctrl
-
+gif-for-cli 
 
 
 
@@ -260,3 +262,5 @@ Then set the EDITOR environment variable to Sublime. You may prefer to add one o
 
 Same for the viewer, just you uncheck the Use internal view option and set the VIEWER environment variable instead.
 
+
+Okay, previewing is NOT working at all like I want it to with lf or mc. grumble.

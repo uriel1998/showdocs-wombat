@@ -1,3 +1,4 @@
 csvkit>=1.0.5
 xlsx2csv>=0.7.7
 gtabview>=0.8
+gif-for-cli>=1.1.2

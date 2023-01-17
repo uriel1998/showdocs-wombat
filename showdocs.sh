@@ -293,12 +293,17 @@ show_images_gif (){
     if [ "$GUI" == "1" ];then
         nohup $IMAGEGUI "${infile}" > /dev/null 2>&1 &
     else
-        # while GIF support supposedly exists, it is unreliable, so extract a frame here
-        tmpfile3=$(mktemp /tmp/showdocs-wombat.XXXXXXXXXXXX.jpg)
-        $(which ffmpeg) -hide_banner -loglevel panic -y -i "${infile}" -r 1/1 -frames 1 ${tmpfile3}
-        CommandLine=$(echo "${IMAGECLI} ${tmpfile3} ; read")
-        eval "${CommandLine}"
-        rm "${tmpfile3}"
+        if [ -f $(which gif-for-cli) ];then
+            CommandLine=$(echo "$(which gif-for-cli) ${infile} ; read")
+            eval "${CommandLine}"
+        else
+            # while GIF support supposedly exists, it is unreliable, so extract a frame here
+            tmpfile3=$(mktemp /tmp/showdocs-wombat.XXXXXXXXXXXX.jpg)
+            $(which ffmpeg) -hide_banner -loglevel panic -y -i "${infile}" -r 1/1 -frames 1 ${tmpfile3}
+            CommandLine=$(echo "${IMAGECLI} ${tmpfile3} ; read")
+            eval "${CommandLine}"
+            rm "${tmpfile3}"
+        fi
     fi    
 }
 
