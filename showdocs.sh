@@ -24,6 +24,8 @@
 # TODO - put all the converter strings in one place
 # TODO - viewer and previewer mode configs for mc, lf, others?
 
+echo "$1" >> /home/steven/test.txt
+
 LOUD=0
 
 function loud() {
@@ -116,36 +118,36 @@ show_archive (){
 }
 
 show_sqlite (){
-    bobarray=( $(sqlite3 "$infile" '.tables') )
+    bobarray=( $(sqlite3 "${infile}" '.tables') )
     tablechoice=$(for d in "${bobarray[@]}"; do echo "$d" ; done | fzf)
-    sqlite3 -csv -header "$infile" "select * from ${tablechoice}" | pspg --csv --csv-header=on --double-header
+    sqlite3 -csv -header "${infile}" "select * from ${tablechoice}" | pspg --csv --csv-header=on --double-header
 }
 
 show_docx (){
-    pandoc -f docx "$infile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | eval "$browsercommand"
+    pandoc -f docx "${infile}" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | eval "$browsercommand"
 }
 
 show_doc (){
     if [[ "$mimetype" == *"$docstring"* ]];then        
-        wvWare "$infile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | eval "$browsercommand"
+        wvWare "${infile}" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | eval "$browsercommand"
     elif [[ "$mimetype" == *"$rtfstring"* ]];then
-        unrtf --html "$infile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | eval "$browsercommand"
+        unrtf --html "${infile}" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | eval "$browsercommand"
     else
         show_text
     fi
 }
 
 show_odt (){
-    pandoc -f odt "$infile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | eval "$browsercommand"
+    pandoc -f odt "${infile}" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | eval "$browsercommand"
 }
 
 show_rtf (){
-    unrtf --html "$infile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | eval "$browsercommand"
+    unrtf --html "${infile}" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | eval "$browsercommand"
 }
 
 show_pdf (){
     
-    pdftotext -nopgbrk -layout -nodiag "$infile" "$tmpfile"    
+    pdftotext -nopgbrk -layout -nodiag "${infile}" "$tmpfile"    
     # Testing the file size
     minimumsize=512
     actualsize=$(wc -c <"$tmpfile")
@@ -188,11 +190,11 @@ show_ods (){
     if [ $(which ssconvert) ];then
         tmpfile2=$(mktemp /tmp/showdocs-wombat.XXXXXXXXXXXXXXXXXXX.csv)
         #gnumeric is quickest
-        ssconvert "$infile" "$tmpfile2" > /dev/null
+        ssconvert "${infile}" "$tmpfile2" > /dev/null
     elif [ $(which soffice) ];then
         tmpfile2=$(mktemp /tmp/showdocs-wombat.XXXXXXXXXXXXXXXXXXX.csv)
         #libreoffice headless also works
-        soffice --headless --convert-to csv "$infile" "$tmpfile2"
+        soffice --headless --convert-to csv "${infile}" "$tmpfile2"
     fi
     if [ ! -z "$tmpfile2" ];then
         tabview "$tmpfile2"
@@ -201,25 +203,25 @@ show_ods (){
 }
 
 show_json () {
-    echo "[$(cat "$infile")]" | in2csv -I -f json | csvtool transpose - | tabview -
+    echo "[$(cat "${infile}")]" | in2csv -I -f json | csvtool transpose - | tabview -
 }
 
 show_excel (){
     tmpfile2=""
     if [ $(which in2csv) ];then
-        in2csv "$infile" | tabview -    
+        in2csv "${infile}" | tabview -    
         return
     elif [ $(which xlsx2csv) ];then
-        xlsx2csv "$infile" --all | tabview -
+        xlsx2csv "${infile}" --all | tabview -
         return    
     elif [ $(which ssconvert) ];then
         tmpfile2=$(mktemp /tmp/showdocs-wombat.XXXXXXXXXXXXXXXXXXX.csv)
         #gnumeric is quickest
-        ssconvert "$infile" "$tmpfile2"
+        ssconvert "${infile}" "$tmpfile2"
     elif [ $(which soffice) ];then
         tmpfile2=$(mktemp /tmp/showdocs-wombat.XXXXXXXXXXXXXXXXXXX.csv)
         #libreoffice headless also works
-        soffice --headless --convert-to csv "$infile" "$tmpfile2"
+        soffice --headless --convert-to csv "${infile}" "$tmpfile2"
     fi
     if [ ! -z "$tmpfile2" ];then
         tabview "$tmpfile2"
@@ -228,11 +230,11 @@ show_excel (){
 }
 
 show_csv (){
-    tabview "$infile"
+    tabview "${infile}"
 }
 
 show_epub (){
-    epy "$infile"
+    epy "${infile}"
 }
 
 show_html (){
@@ -240,11 +242,12 @@ show_html (){
 }
 
 show_markdown (){
-    pandoc -s -f markdown -t html "$infile" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | eval "$browsercommand"
+    pandoc -s -f markdown -t html "${infile}" | sed "s@href=\"@href=\"file://localhost$indir/@g" | sed "s@file://localhost$indir/http@http@g" | eval "$browsercommand"
 }
 
 show_text (){
-    bat --paging=always "$infile" 
+    #bat --paging=always "${infile}" 
+    less --mouse -M -s -J -~ -- "${infile}" 
 }
 
 show_ansiart (){
@@ -255,8 +258,8 @@ show_ansiart (){
         rm ${tmpfile3}
     else
         # If you care about simulating baud rates
-        #iconv -f 437 "$infile" | pv --quiet --rate-limit 7000
-        iconv -f 437 "$infile"
+        #iconv -f 437 "${infile}" | pv --quiet --rate-limit 7000
+        iconv -f 437 "${infile}" | less --mouse -M -s -J -~ 
     fi
 }
 
@@ -394,7 +397,7 @@ if [ "$1" != "-p" ];then
         else
             c_tmux=$(env | grep -c TMUX)  # Are we in tmux?
             if [ $c_tmux -gt 0 ] && [ ! -z "$DevourBinary" ];then #does devour exist?
-                FunkyPath=$(echo "$@" | sed 's/#/\\#/g')
+                FunkyPath=$(echo "${@}" | sed 's/#/\\#/g')
                 "$DevourBinary" "$SCRIPT_DIR/showdocs.sh +-+ $FunkyPath"  # re-call it in devour
                 exit
             fi
@@ -479,10 +482,10 @@ fi
 
 cmdstring=$(printf "realpath \"%s\"" "$FunkyPath")
 infile=$(eval "$cmdstring")
-indir=$(dirname "$infile")
+indir=$(dirname "${infile}")
     
-if [ -f "$infile" ]; then
-    filename=$(basename "$infile")
+if [ -f "${infile}" ]; then
+    filename=$(basename "${infile}")
     #get extension, lowercase it
     extension=$(echo "${filename##*.}" | tr '[:upper:]' '[:lower:]')
     mimetype=$(file "$filename" | awk -F ':' '{ print $2 }') 
